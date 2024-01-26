@@ -238,7 +238,7 @@ export default function Home() {
       };
       const onComplete = () => {
         setGameStatus("ended");
-        console.log("The stream has completed");
+        console.log("The stream has completed!");
       };
       stream.then(readStream(onMessage)).then(onComplete);
     } catch (error) {
