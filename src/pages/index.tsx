@@ -219,8 +219,9 @@ export default function Home() {
             gameStatus !== "active" &&
             obj.state.moves &&
             obj.state.moves !== ""
-          )
+          ) {
             setGameStatus("active");
+          }
           setupGame(obj.state.moves);
           setWhiteTime(obj.state.wtime); // Convert milliseconds to seconds
           setBlackTime(obj.state.btime); // Convert milliseconds to seconds
@@ -235,10 +236,14 @@ export default function Home() {
           setBlackTime(obj.btime); // Convert milliseconds to seconds
         }
       };
-      const onComplete = () => console.log("The stream has completed");
+      const onComplete = () => {
+        setGameStatus("ended");
+        console.log("The stream has completed");
+      };
       stream.then(readStream(onMessage)).then(onComplete);
     } catch (error) {
       console.error("Error in streaming game data:", error);
+      setGameStatus("ended");
     }
   };
 
@@ -264,7 +269,10 @@ export default function Home() {
           //challenge declined or canceled
         }
       };
-      const onComplete = () => console.log("The stream has completed");
+      const onComplete = () => {
+        setGameStatus("ended");
+        console.log("The stream has completed");
+      };
       stream.then(readStream(onMessage)).then(onComplete);
     } catch (error) {
       console.error("Error in streaming game data:", error);
