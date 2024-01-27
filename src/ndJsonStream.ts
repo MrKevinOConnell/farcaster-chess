@@ -8,15 +8,19 @@ export interface Stream {
   close(): Promise<void>;
 }
 
-export const readStream = (name: string, response: Response, handler: Handler): Stream => {
+export const readStream = (
+  name: string,
+  response: Response,
+  handler: Handler
+): Stream => {
   const stream = response.body!.getReader();
   const matcher = /\r?\n/;
   const decoder = new TextDecoder();
-  let buf = '';
+  let buf = "";
 
   const process = (json: string) => {
     const msg = JSON.parse(json);
-    console.log(name, msg);
+
     handler(msg);
   };
 
@@ -32,8 +36,8 @@ export const readStream = (name: string, response: Response, handler: Handler): 
         buf += chunk;
 
         const parts = buf.split(matcher);
-        buf = parts.pop() || '';
-        for (const i of parts.filter(p => p)) process(i);
+        buf = parts.pop() || "";
+        for (const i of parts.filter((p) => p)) process(i);
         return loop();
       }
     });

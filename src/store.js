@@ -1,7 +1,25 @@
+import create from "zustand";
+import { persist } from "zustand/middleware";
 
-import create from 'zustand'
+export const useStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      invitedUser: null,
 
-export const useStore = create((set) => ({
-  user: null,
-  setUser: (user) => set((state) => ({...state.user,user })),
-}))
+      setInvitedUser: (invitedUser) =>
+        set((state) => ({ ...state, invitedUser })),
+      setUser: (user) => set((state) => ({ ...state, user })),
+      openChallengeModal: false,
+      openLichessModal: false,
+      setLichessModal: (openLichessModal) =>
+        set((state) => ({ ...state, openLichessModal })),
+      setChallengeModal: (openChallengeModal) =>
+        set((state) => ({ ...state, openChallengeModal })),
+    }),
+    {
+      name: "user-store", // unique name of the store
+      getStorage: () => localStorage, // specify the storage to use (localStorage is the default)
+    }
+  )
+);

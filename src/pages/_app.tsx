@@ -1,45 +1,38 @@
-import '@/styles/globals.css'
-import { ConnectKitProvider } from 'connectkit'
-import type { AppProps } from 'next/app'
-import { configureChains, mainnet, createClient, WagmiConfig } from 'wagmi'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
- 
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import "@/styles/globals.css";
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet],
-  [alchemyProvider({ apiKey: "0FcFPfkxRpb3ouuMeAJZxVuJyVnVrW12"}), publicProvider()],
-)
- 
-// Set up client
-const client = createClient({
-  autoConnect: true,
-  connectors: [
-    new MetaMaskConnector({ chains }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: 'wagmi',
-        headlessMode: true
-      },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        qrcode: true,
-      },
-    }),
-  ],
-  provider,
-  webSocketProvider,
-})
+import type { AppProps } from "next/app";
+import "@farcaster/auth-kit/styles.css";
+import { AuthKitProvider } from "@farcaster/auth-kit";
+import { SignInButton } from "@farcaster/auth-kit";
+import { Profile } from "@/components/Profile";
+import ChallengeModal from "@/components/ChallengeModal";
+import LichessModal from "@/components/LichessModal";
+
+const config = {
+  rpcUrl: "https://mainnet.optimism.io",
+  domain: "example.com",
+  siweUri: "https://example.com/login",
+};
+
 export default function App({ Component, pageProps }: AppProps) {
-  return     <WagmiConfig client={client}>
-  <ConnectKitProvider><Component {...pageProps} />
-  </ConnectKitProvider>
-  </WagmiConfig>
+  return (
+    <AuthKitProvider config={config}>
+      <div
+        className="fixed h-screen w-screen t-0 l-0 z-50"
+        style={{
+          background: "#8a63d2",
+          mixBlendMode: "overlay",
+          opacity: 1,
+          pointerEvents: "none",
+        }}
+      />
+      <div className="flex justify-end p-2 m-4">
+        <Profile />
+      </div>
+      <ChallengeModal />
+      <LichessModal />
+
+      <Component {...pageProps} />
+    </AuthKitProvider>
+  );
 }

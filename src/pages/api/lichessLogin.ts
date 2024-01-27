@@ -1,9 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { sha256 } from "js-sha256";
-import base64url from "base64url";
-import { base64URLEncode } from "../../util";
-import { ethers } from "ethers";
-import { useCookies } from "react-cookie";
+
 type Data = {
   json: any;
   token: any;
@@ -14,15 +10,13 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    const { code, verify } = req.query;
+    const { code, verify } = JSON.parse(req.body);
 
-    console.log("code", code);
-    console.log("verify", verify);
     const postData = {
       grant_type: "authorization_code",
       code: code,
       code_verifier: verify,
-      redirect_uri: "http://localhost:3000/",
+      redirect_uri: `${process.env.NEXT_PUBLIC_URL}/`,
       client_id: "farcasterchess",
     };
     const loginRes = await fetch(`https://lichess.org/api/token`, {
@@ -35,7 +29,7 @@ export default async function handler(
 
     if (loginRes.ok) {
       const json = await loginRes.json();
-      console.log("json", json);
+
       const accountRes = await fetch(`https://lichess.org/api/account`, {
         method: "GET",
         headers: {
@@ -45,7 +39,6 @@ export default async function handler(
       });
       if (accountRes.ok) {
         const accountJson = await accountRes.json();
-        console.log("account json", accountJson);
         res.status(200).json({ json: accountJson, token: json });
       }
     } else {

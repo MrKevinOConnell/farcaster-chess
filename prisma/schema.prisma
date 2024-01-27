@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  fid         String       @id @unique
+  username    String       @unique
+  bio         String?
+  displayName String
+  pfpUrl      String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  lichessInfo LichessInfo?
+  neynar_info NeynarInfo? // This is okay if a User might not always have a NeynarInfo
+
+  @@map("users")
+}
+
+model LichessInfo {
+  id          String   @id
+  username    String
+  userFid     String   @unique
+  accessToken String?
+  expiresIn   Int?
+  tokenType   String?
+  user        User     @relation(fields: [userFid], references: [fid])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@map("lichess_info")
+}
+
+model NeynarInfo {
+  id                  String   @id @default(uuid())
+  deadline            Int
+  status              String
+  signer_uuid         String   @unique
+  signer_approval_url String
+  fid                 Int?
+  user_id             String?  @unique
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  user                User?    @relation(fields: [user_id], references: [fid], onDelete: Cascade)
+}
