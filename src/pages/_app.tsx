@@ -9,9 +9,9 @@ import ChallengeModal from "@/components/ChallengeModal";
 import LichessModal from "@/components/LichessModal";
 
 const config = {
-  rpcUrl: "https://mainnet.optimism.io",
-  domain: "farcaster-chess.vercel.app/",
-  siweUri: "https://farcaster-chess.vercel.app/",
+  rpcUrl: process.env.NEXT_PUBLIC_OPTIMISM_RPC as string,
+  domain: "farcaster-chess.vercel.app",
+  siweUri: "https://www.farcaster-chess.vercel.app",
 };
 
 export default function App({ Component, pageProps }: AppProps) {
