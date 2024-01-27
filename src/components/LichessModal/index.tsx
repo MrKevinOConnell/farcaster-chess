@@ -18,7 +18,7 @@ const LichessModal = () => {
   const setModal = useStore((state) => state.setLichessModal);
   const user = useStore((state) => state.user);
   const invitedUserId = useStore((state) => state.invitedUser);
-  console.log("invitedUserId", invitedUserId);
+
   const [invitee, setInvitee] = useState<any>(null);
   const router = useRouter();
 
@@ -86,12 +86,10 @@ const LichessModal = () => {
   useEffect(() => {
     const fetchInvitedUser = async () => {
       if (invitedUserId) {
-        console.log("invitedUserId", invitedUserId);
         try {
           const fetchedUser = await getUserWithLichessInfo(invitedUserId);
-          console.log("fetchedUser", fetchedUser);
+
           if (fetchedUser && fetchedUser.lichess_info) {
-            console.log("fetchedUser.lichess_info", fetchedUser.lichess_info);
             setInvitee(fetchedUser);
           }
         } catch (error) {
@@ -131,16 +129,12 @@ const LichessModal = () => {
       }
 
       const challengeInfo = await response.json();
-      console.log("Challenge info:", challengeInfo);
 
       // Once the challenge is sent, start listening for updates
     } catch (error) {
       console.error("Error challenging user:", error);
     }
   };
-
-  console.log("invitee", invitee);
-  console.log("user", user);
 
   return (
     <>

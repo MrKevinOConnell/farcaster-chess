@@ -27,6 +27,7 @@ export default function Home() {
   const setModal = useStore((state) => state.setChallengeModal);
   const setLichessModal = useStore((state) => state.setLichessModal);
   const setInvitedUser = useStore((state) => state.setInvitedUser);
+  const [challenges, setChallenges] = useState<any>([]);
   const updateStoreModal = async (newModal: boolean) => {
     setModal(newModal);
   };
@@ -64,26 +65,6 @@ export default function Home() {
       if (timer) clearInterval(timer);
     };
   }, [currentGame, gameStatus]); // Include gameStatus in the dependency array
-
-  const fetchChallenges = async () => {
-    try {
-      const response = await fetch("https://lichess.org/api/challenge", {
-        headers: {
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch challenges");
-      }
-
-      const challenges = await response.json();
-
-      // Process and display challenges
-    } catch (error) {
-      console.error("Error fetching challenges:", error);
-    }
-  };
 
   const acceptChallenge = async (challengeId: string) => {
     try {
@@ -219,7 +200,6 @@ export default function Home() {
   };
 
   const accountListening = async () => {
-    console.log("accountListening", user);
     if (!user || !user.accessToken) return;
     const streamUrl = "https://lichess.org/api/stream/event";
 
@@ -229,18 +209,30 @@ export default function Home() {
       });
 
       const onMessage = (obj: any) => {
-        if (obj.type === "gameStarted") {
+        if (obj.type === "gameStart") {
+          setChallenges((prev: any) => {
+            return prev.filter((challenge: any) => {
+              return challenge.gameId !== obj.game.id;
+            });
+          });
           setCurrentGameId(obj.id);
           updateStoreModal && updateStoreModal(false);
           updateLichessModal(false);
-        } else if (obj.status === "gameEnded") {
+        } else if (obj.status === "gameFinish") {
           setGameStatus("ended");
         } else if (obj.type === "challenge") {
           //CHALLENGE ADDED
+          setChallenges((prev: any) => [
+            ...prev,
+            {
+              gameId: obj.challenge.id,
+              challenger: obj.challenge.challenger.id,
+            },
+          ]);
           setupGame(obj.moves);
           setWhiteTime(obj.wtime); // Convert milliseconds to seconds
           setBlackTime(obj.btime); // Convert milliseconds to seconds
-        } else {
+        } else if (obj.type === "challengeCanceled") {
           //challenge declined or canceled
         }
       };
@@ -414,6 +406,16 @@ export default function Home() {
       </select>
 
       <div className="w-11/12 max-w-lg mb-4 md:mb-0 md:max-w-xl">
+        {challenges.map((challenge: any) => (
+          <div key={challenge.gameId}>
+            <p>Challenge {challenge.challenger}</p>
+            <button
+              onClick={async () => await acceptChallenge(challenge.gameId)}
+            >
+              Accept
+            </button>
+          </div>
+        ))}
         <Chessboard
           position={currentGame.fen()}
           customBoardStyle={{ width: "100%", height: "100%" }}
