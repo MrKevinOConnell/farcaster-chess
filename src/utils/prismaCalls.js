@@ -111,7 +111,7 @@ export async function checkUserAndLichessAccount(user, signedInUser) {
         error: "Error creating user",
       };
     }
-    const message = `Testing something in prod, don't mind me :), ${process.env.NEXT_PUBLIC_URL}?user=${signedInUser.fid}`;
+    const message = `Hey @${user.username}! Come play chess against me at ${process.env.NEXT_PUBLIC_URL}?user=${signedInUser.fid}`;
 
     const cast = await sendCast(message, signedInUser.fid, chessChannel);
 
