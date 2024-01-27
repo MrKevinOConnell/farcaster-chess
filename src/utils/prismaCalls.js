@@ -100,9 +100,9 @@ export async function checkUserAndLichessAccount(user, signedInUser) {
       const userExists = add != null;
 
       //send cast
-      // const message = `Testing something in prod, don't mind me :), ${process.env.NEXT_PUBLIC_URL}?user=${user.fid}`;
+      const message = `Hey @${user.username}! Come play chess against me at ${process.env.NEXT_PUBLIC_URL}?user=${signedInUser.fid}`;
 
-      // const cast = await sendCast(message, user.fid, chessChannel);
+      const cast = await sendCast(message, signedInUser.fid, chessChannel);
       console.log(cast);
       return {
         userExists,
@@ -114,7 +114,7 @@ export async function checkUserAndLichessAccount(user, signedInUser) {
     const message = `Hey @${user.username}! Come play chess against me at ${process.env.NEXT_PUBLIC_URL}?user=${signedInUser.fid}`;
 
     const cast = await sendCast(message, signedInUser.fid, chessChannel);
-
+    console.log(cast);
     // If user exists, check for LichessInfo
     let { data: lichessData, error: lichessError } = await supabase
       .from("lichess_info")
