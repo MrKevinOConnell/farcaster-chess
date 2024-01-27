@@ -71,41 +71,6 @@ export function Profile() {
               displayName,
               pfpUrl,
             });
-            const userToken = localStorage.getItem("user");
-            if (!userToken) {
-              const lichessProfile = await fetch("/api/lichessAuth", {
-                method: "GET",
-              });
-              const lichessProfileJson = await lichessProfile.json();
-              if (lichessProfileJson.url) {
-                localStorage.setItem("verify", lichessProfileJson.verifier);
-                window.location.href = lichessProfileJson.url;
-              }
-            } else {
-              const {
-                token,
-                id,
-                username: lichessName,
-              } = JSON.parse(userToken);
-              const { access_token, expires_in, token_type } = token;
-
-              const updatedUser = await upsertLichessInfo(fid, {
-                username: lichessName,
-                id,
-                accessToken: access_token,
-                expiresIn: expires_in,
-                tokenType: token_type,
-              });
-              await updateStoreUser({
-                fid,
-                username,
-                lichessName,
-                bio,
-                displayName,
-                pfpUrl,
-                accessToken: access_token,
-              });
-            }
           }}
         />
       )}

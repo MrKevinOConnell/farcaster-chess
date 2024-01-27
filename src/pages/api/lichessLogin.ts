@@ -16,7 +16,7 @@ export default async function handler(
       grant_type: "authorization_code",
       code: code,
       code_verifier: verify,
-      redirect_uri: "http://localhost:3000/",
+      redirect_uri: `${process.env.NEXT_PUBLIC_URL}/`,
       client_id: "farcasterchess",
     };
     const loginRes = await fetch(`https://lichess.org/api/token`, {

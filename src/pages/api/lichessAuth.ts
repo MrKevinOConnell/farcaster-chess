@@ -17,7 +17,7 @@ export default async function handler(
         .replace(":", "%3A")
         .replace(" ", "%20");
 
-      const url = `https://lichess.org/oauth?response_type=code&client_id=farcasterchess&redirect_uri=http://localhost:3000/&code_challenge_method=S256&code_challenge=${challenge.code_challenge}&scope=${scope}`;
+      const url = `https://lichess.org/oauth?response_type=code&client_id=farcasterchess&redirect_uri=${process.env.NEXT_PUBLIC_URL}/&code_challenge_method=S256&code_challenge=${challenge.code_challenge}&scope=${scope}`;
 
       res.status(200).json({ url, verifier: challenge.code_verifier });
       return;

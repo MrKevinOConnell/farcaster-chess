@@ -46,3 +46,26 @@ export async function readNeynarStream(stream) {
   }
   return Buffer.concat(chunks).toString("utf8");
 }
+
+export const sendCast = async (text, user_id, parent_url) => {
+  try {
+    const res = await fetch("/api/post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        user_id,
+        parent_url,
+        // Your request body here
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+
+    const data = await res.json();
+  } catch (err) {}
+};

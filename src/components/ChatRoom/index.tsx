@@ -1,5 +1,5 @@
 // ChatRoom.tsx
-import { fetcher, neynarFetcher } from "@/util";
+import { fetcher, neynarFetcher, sendCast } from "@/util";
 import React, { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import "@farcaster/auth-kit/styles.css";
@@ -9,6 +9,8 @@ import { SignInButton, useProfile, useSignIn } from "@farcaster/auth-kit";
 import { getRelativeTime } from "@/utils/timeUtils";
 import { encode } from "punycode";
 import { useStore } from "@/store";
+import { chessChannel } from "@/constants";
+
 // Define a type for the message object
 type Message = {
   user: string;
@@ -29,13 +31,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
 
   useEffect(() => {
     if (gameId) {
-      setParentURL(
-        `chain://eip155:7777777/erc721:0xca3e25b5c41b02ffa6f3b053426e96b59b64a9ae/${gameId}`
-      );
+      setParentURL(`${chessChannel}${gameId}`);
     } else {
-      setParentURL(
-        "chain://eip155:7777777/erc721:0xca3e25b5c41b02ffa6f3b053426e96b59b64a9ae"
-      );
+      setParentURL(`${chessChannel}`);
     }
   }, [gameId]);
 
@@ -128,32 +126,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
   if (!data) return <div>Loading...</div>;
   const messages = data.casts ?? [];
 
-  const sendCast = async () => {
-    try {
-      const res = await fetch("/api/post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: newMessage,
-          user_id: user.fid,
-          parent_url: parentURL,
-          // Your request body here
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status}`);
-      }
-
-      const data = await res.json();
-    } catch (err) {}
-  };
-
   const sendMessage = async () => {
     if (newMessage.trim() !== "") {
-      await sendCast();
+      await sendCast(newMessage, user.fid, parentURL);
       setNewMessage(""); // Reset input after sending
     }
   };

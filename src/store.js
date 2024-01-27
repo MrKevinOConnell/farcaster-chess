@@ -5,7 +5,17 @@ export const useStore = create(
   persist(
     (set) => ({
       user: null,
+      invitedUser: null,
+
+      setInvitedUser: (invitedUser) =>
+        set((state) => ({ ...state, invitedUser })),
       setUser: (user) => set((state) => ({ ...state, user })),
+      openChallengeModal: false,
+      openLichessModal: false,
+      setLichessModal: (openLichessModal) =>
+        set((state) => ({ ...state, openLichessModal })),
+      setChallengeModal: (openChallengeModal) =>
+        set((state) => ({ ...state, openChallengeModal })),
     }),
     {
       name: "user-store", // unique name of the store

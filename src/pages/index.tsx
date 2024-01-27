@@ -9,7 +9,6 @@ import ChatRoom from "@/components/ChatRoom";
 import { useStore } from "@/store";
 import { BoardOrientation } from "react-chessboard/dist/chessboard/types";
 import { readStream } from "@/util";
-import { upsertLichessInfo } from "@/utils/prismaCalls";
 
 function formatTime(milliseconds: number) {
   if (milliseconds <= 0) {
@@ -25,19 +24,25 @@ function formatTime(milliseconds: number) {
 }
 
 export default function Home() {
+  const setModal = useStore((state) => state.setChallengeModal);
+  const setLichessModal = useStore((state) => state.setLichessModal);
+  const setInvitedUser = useStore((state) => state.setInvitedUser);
+  const updateStoreModal = async (newModal: boolean) => {
+    setModal(newModal);
+  };
+
+  const updateLichessModal = async (newModal: boolean) => {
+    setLichessModal(newModal);
+  };
+
   const [gameStatus, setGameStatus] = useState("ended"); // initial status is 'active'
   const user = useStore((state: any) => state.user);
   const [boardOrientation, setBoardOrientation] =
     useState<BoardOrientation>("white");
 
-  const setUser = useStore((state) => state.setUser);
   const [whiteTime, setWhiteTime] = useState<null | number>(null); // 5 minutes in seconds
   const [blackTime, setBlackTime] = useState<null | number>(null); // 5 minutes in seconds
 
-  // Call this function when you want to update the user state in the store
-  const updateStoreUser = async (newUserData: any) => {
-    setUser(newUserData);
-  };
   const [currentGameData, setCurrentGameData] = useState<any>(null); // [gameId, isUserPlaying
   const [games, setGames] = useState<any>([]);
   const [currentGameId, setCurrentGameId] = useState<null | string>(null);
@@ -77,41 +82,6 @@ export default function Home() {
       // Process and display challenges
     } catch (error) {
       console.error("Error fetching challenges:", error);
-    }
-  };
-
-  const challengeUser = async (username: string) => {
-    try {
-      const body = {
-        rated: true,
-        "clock.limit": 600,
-        "clock.increment": 0,
-        color: "white",
-        variant: "standard",
-        keepAliveStream: true,
-      };
-
-      const response = await fetch(
-        `https://lichess.org/api/challenge/${username}`, // Lichess API endpoint to challenge a user
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${user.accessToken}`, // User's access token
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to challenge user ${username}`);
-      }
-
-      const challengeInfo = await response.json();
-
-      // Once the challenge is sent, start listening for updates
-    } catch (error) {
-      console.error("Error challenging user:", error);
     }
   };
 
@@ -202,6 +172,7 @@ export default function Home() {
   };
 
   const startStreaming = async (gameId: string, isPlaying: boolean) => {
+    if (!user || !user.accessToken) return;
     const streamUrl = isPlaying
       ? `https://lichess.org/api/board/game/stream/${gameId}`
       : `https://lichess.org/api/stream/game/${gameId}`;
@@ -248,6 +219,8 @@ export default function Home() {
   };
 
   const accountListening = async () => {
+    console.log("accountListening", user);
+    if (!user || !user.accessToken) return;
     const streamUrl = "https://lichess.org/api/stream/event";
 
     try {
@@ -258,6 +231,8 @@ export default function Home() {
       const onMessage = (obj: any) => {
         if (obj.type === "gameStarted") {
           setCurrentGameId(obj.id);
+          updateStoreModal && updateStoreModal(false);
+          updateLichessModal(false);
         } else if (obj.status === "gameEnded") {
           setGameStatus("ended");
         } else if (obj.type === "challenge") {
@@ -280,9 +255,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (user) {
-      accountListening();
-    }
+    accountListening();
   }, [user]);
 
   const setupGameForView = (data: any) => {
@@ -342,55 +315,22 @@ export default function Home() {
 
   const router = useRouter();
 
-  const getUser = async () => {
-    //WHEN DONE
-    if (router.query.code && localStorage.getItem("verify")) {
-      const code = router.query.code;
-      const verify = localStorage.getItem("verify");
-
-      if (code) {
-        const res = await fetch("/api/lichessLogin", {
-          method: "POST",
-          body: JSON.stringify({ code, verify }),
-        });
-        const json = await res.json();
-
-        const { username, id } = json.json;
-        const { access_token, expires_in, token_type } = json.token;
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            username,
-            id,
-            token: json.token,
-          })
-        );
-
-        localStorage.removeItem("verify");
-
-        if (user) {
-          const updatedUser = await upsertLichessInfo(user.fid, {
-            username,
-            id,
-            accessToken: access_token,
-            expiresIn: expires_in,
-            tokenType: token_type,
-          });
-          await updateStoreUser({
-            fid: user.fid,
-            username: user.username,
-            lichessName: username,
-            bio: user.bio,
-            displayName: user.displayName,
-            pfpUrl: user.pfpUrl,
-            accessToken: access_token,
-          });
-        }
-      }
+  const getUpdatedUser = async () => {
+    if (router.query.user) {
+      const invitedUser = router.query.user;
+      await setInvitedUser(invitedUser as string);
+    }
+    if (!user) {
+      await setLichessModal(true);
+    } else if (user && router.query.code) {
+      await setLichessModal(true);
+    } else {
+      await setLichessModal(false);
     }
   };
+
   useEffect(() => {
-    getUser();
+    getUpdatedUser();
   }, [router.query]);
 
   const handleMove = async (
@@ -485,12 +425,12 @@ export default function Home() {
         <div className="flex justify-around items-center my-4">
           <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
             <p className="text-lg font-semibold">White</p>
-            <p className="text-2xl font-mono">{formatTime(whiteTime)}</p>
+            <p className="text-2xl font-mono">{formatTime(whiteTime as any)}</p>
           </div>
 
           <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
             <p className="text-lg font-semibold">Black</p>
-            <p className="text-2xl font-mono">{formatTime(blackTime)}</p>
+            <p className="text-2xl font-mono">{formatTime(blackTime as any)}</p>
           </div>
           {currentGameData && (
             <button
@@ -503,7 +443,7 @@ export default function Home() {
 
           <button
             className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-red-700"
-            onClick={async () => await challengeUser("kevofarcasterchess")}
+            onClick={async () => await updateStoreModal(true)}
           >
             Challenge
           </button>
