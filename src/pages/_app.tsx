@@ -10,8 +10,8 @@ import LichessModal from "@/components/LichessModal";
 
 const config = {
   rpcUrl: "https://mainnet.optimism.io",
-  domain: "example.com",
-  siweUri: "https://example.com/login",
+  domain: "farcaster-chess.vercel.app/",
+  siweUri: "https://farcaster-chess.vercel.app/",
 };
 
 export default function App({ Component, pageProps }: AppProps) {
