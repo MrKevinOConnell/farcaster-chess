@@ -1,9 +1,3 @@
-import { verifyMessage, arrayify } from "ethers/lib/utils";
-import canonicalize from "canonicalize";
-import { useCallback, useEffect, useState } from "react";
-import { ConnectKitButton } from "connectkit";
-import { createClient } from "@supabase/supabase-js";
-
 import {
   createUser,
   updateUser,
