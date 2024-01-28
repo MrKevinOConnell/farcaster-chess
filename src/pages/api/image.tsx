@@ -72,7 +72,7 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 function convertImage(filePath: string) {
   return new Promise((resolve, reject) => {
     im.convert(
-      [filePath, "-coalesce", "-resize", "200x200", "+adjoin", "%d.png"],
+      [filePath, "-coalesce", "-resize", "50x50", "+adjoin", "%d.png"],
       function (err, stdout) {
         if (err) {
           console.error("Error:", err);
