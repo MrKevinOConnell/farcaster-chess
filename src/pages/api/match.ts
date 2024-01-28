@@ -15,11 +15,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { match, turn } = req.query;
-    try {
-      const fid = req.body?.untrustedData?.fid;
-      const { hash } = req.body?.untrustedData.castId;
+    const { match, turn, next } = req.query;
+    console.log({ match, turn });
 
+    try {
+      const { hash } = req.body?.untrustedData.castId;
+      const { buttonIndex, fid } = req.body?.untrustedData;
+      let newTurn = Number(turn) + (next ? 1 : -1);
       console.log({ fid, hash });
 
       if (!fid || !hash) {
@@ -36,9 +38,22 @@ export default async function handler(
             <head>
                 <title>Test Event</title>
                 <meta property="og:title" content="Chess Game">
-                <meta property="og:image" content="${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${match}&turn=${turn}">
+                <meta property="og:image" content="${
+                  process.env.NEXT_PUBLIC_URL
+                }/api/image?gameId=${match}&turn=${turn}">
                 <meta name="fc:frame" content="vNext">
-                <meta name="fc:frame:image" content="${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${match}&turn=${turn}">
+                <meta name="fc:frame:image" content="${
+                  process.env.NEXT_PUBLIC_URL
+                }/api/image?gameId=${match}&turn=${turn}">
+                <meta name="fc:frame:button:1" content="Previous">
+                <meta name="fc:frame:button:2" content="Next">
+                <meta name="fc:frame:post_url" content="${
+                  process.env.HOST
+                }/api/match?${match}&turn=${newTurn}&next=${
+        buttonIndex === 2
+      }">,
+                
+                
             </head>
             <body>
                 <h1>Chess Game</h1>

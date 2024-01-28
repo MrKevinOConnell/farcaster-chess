@@ -13,6 +13,7 @@
     "@chrisoakman/chessboardjs": "^1.0.0",
     "@emotion/react": "^11.10.5",
     "@farcaster/auth-kit": "^0.0.39",
+    "@imagemagick/magick-wasm": "^0.0.28",
     "@mantine/core": "^5.10.1",
     "@mantine/hooks": "^5.10.1",
     "@next/font": "13.1.4",
@@ -56,6 +57,7 @@
     "sjcl": "^1.0.8",
     "swr": "^2.2.4",
     "typescript": "^5.0.4",
+    "util": "^0.12.5",
     "viem": "^2.5.0",
     "wagmi": "^0.10.1",
     "yarn": "^1.22.19",
@@ -63,6 +65,7 @@
     "zustand-persist": "^0.4.0"
   },
   "devDependencies": {
+    "@types/imagemagick": "^0.0.35",
     "autoprefixer": "^10.4.17",
     "eslint-config-next": "^14.1.0",
     "postcss": "^8.4.33",
