@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm i --legacy-peer-deps && npm run dev",
+    "start": "npm i --legacy-peer-deps && prisma generate && npm run dev",
     "lint": "next lint"
   },
   "dependencies": {
