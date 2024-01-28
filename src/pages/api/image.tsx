@@ -107,7 +107,7 @@ export default async function handler(
 
   try {
     const { gameId } = req.query; // Or however you obtain the game ID
-    const supabasePath = `${gameId}/${turn ?? "0"}.png`;
+    let supabasePath = `${gameId}/${turn ?? "0"}.png`;
     const imageURL = await checkFileExistsAndGetUrl("chess-png", supabasePath);
 
     if (imageURL) {
@@ -177,12 +177,12 @@ export default async function handler(
       const readFileAsync = promisify(fs.readFile);
       const arrayBuffer = await response.arrayBuffer();
       const gifBuffer = Buffer.from(arrayBuffer);
-      const filePath = "./image.gif";
+      const filePath = "/tmp/image.gif";
       const write = await writeFile(filePath, gifBuffer);
 
       const image = await convertImage(filePath);
 
-      const imageFrame = `./${turn ?? "0"}.png`;
+      const imageFrame = `/tmp/${turn ?? "0"}.png`;
       // Check if the file exists before attempting to read
       if (!fs.existsSync(imageFrame)) {
         throw new Error(`File not found: ${imageFrame}`);
