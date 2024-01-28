@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: { match: string } }) {
         {/* <Chessboard position={fen as string} /> */}
         <img
           className="w-full"
-          src={`${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=0`}
+          src={`${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=${params.turn}`}
         />
         <div></div>
       </div>
