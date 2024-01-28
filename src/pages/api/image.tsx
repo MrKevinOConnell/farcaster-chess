@@ -1,3 +1,4 @@
+// @ts-ignore
 import type { NextApiRequest, NextApiResponse } from "next";
 import sharp from "sharp";
 import satori from "satori";
