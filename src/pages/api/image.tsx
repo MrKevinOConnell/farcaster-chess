@@ -142,7 +142,7 @@ export default async function handler(
             }}
           >
             {/* Use the Data URL as the image source */}
-            <img src={dataUrl} width={225} />
+            <img src={dataUrl} width={300} height={250} />
           </div>
         </div>,
         {
@@ -225,7 +225,7 @@ export default async function handler(
             }}
           >
             {/* Use the Data URL as the image source */}
-            <img src={dataUrl} width={225} />
+            <img src={dataUrl} width={300} height={250} />
           </div>
         </div>,
         {
