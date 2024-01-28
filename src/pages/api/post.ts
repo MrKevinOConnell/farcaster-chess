@@ -35,6 +35,7 @@ export default async function handler(
         signer_uuid: signerUuid,
         text: text,
         parent: parent_url,
+        channel_id: "chess",
       };
 
       const response = await fetch("https://api.neynar.com/v2/farcaster/cast", {

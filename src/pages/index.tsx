@@ -221,7 +221,7 @@ export default function Home() {
         } else if (obj.status === "gameFinish") {
           setGameStatus("ended");
           //check if user won
-          if (obj.winner === user.lichessName) {
+          if (obj.color === user.winner) {
             //user won
             const win = new Audio("/win.mp3");
             win.play();
