@@ -1,10 +1,5 @@
 // @ts-ignore
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import supabase from "@/db";
 
@@ -18,7 +13,7 @@ import prisma from "./../../../prisma/client";
 import im from "imagemagick";
 const unlinkAsync = promisify(fs.unlink);
 
-async function countAndDeleteGeneratedImages(filePath) {
+async function countAndDeleteGeneratedImages(filePath: any) {
   const directory = filePath.substring(0, filePath.lastIndexOf("/")) || ".";
   let counter = 0;
 

@@ -1,12 +1,6 @@
 // @ts-ignore
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "../../../prisma/client";
 
 export const revalidate = 0;
 

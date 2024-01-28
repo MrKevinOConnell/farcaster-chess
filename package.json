@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@types/imagemagick": "^0.0.35",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
     "autoprefixer": "^10.4.17",
     "eslint-config-next": "^14.1.0",
     "postcss": "^8.4.33",
