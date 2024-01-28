@@ -51,7 +51,7 @@ export default async function handler(
                 }">
                ${
                  newTurn !== 0
-                   ? `<meta name="fc:frame:button:2" content="Next">`
+                   ? `<meta name="fc:frame:button:2" content="NEXT">`
                    : ""
                }
                 <meta name="fc:frame:post_url" content="${
