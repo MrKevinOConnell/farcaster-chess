@@ -291,6 +291,21 @@ export default function Home() {
       chess.move(move);
     });
 
+    // Get the last move details
+    const history = chess.history({ verbose: true });
+    const lastMove = history[history.length - 1];
+
+    // Check if the last move was a capture
+    if (lastMove && lastMove.captured) {
+      const capturedPiece = new Audio("/capture.mp3");
+      capturedPiece.play();
+      console.log("The last move was a capture:", lastMove);
+    } else {
+      const normalMove = new Audio("/move.mp3");
+      normalMove.play();
+      console.log("The last move was not a capture.");
+    }
+
     // Update the game state
     setCurrentGame(chess);
   };
