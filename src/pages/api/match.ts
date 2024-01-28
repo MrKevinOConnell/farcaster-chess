@@ -56,7 +56,7 @@ export default async function handler(
                }
                 <meta name="fc:frame:post_url" content="${
                   process.env.NEXT_PUBLIC_URL
-                }/api/match?${gameId}&turn=${newTurn}&next=${
+                }/api/gameId?${gameId}&turn=${newTurn}&next=${
         buttonIndex === 2 && newTurn !== 0
       }">,
             </head>
