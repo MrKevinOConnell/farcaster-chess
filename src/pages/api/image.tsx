@@ -183,7 +183,7 @@ export default async function handler(
         throw new Error(`Error fetching GIF: ${response.statusText}`);
       }
       const directory = "tmp"; // Or the correct path to your directory
-      await ensureDirectoryExists(directory);
+      // await ensureDirectoryExists(directory);
       const writeFile = promisify(fs.writeFile);
       const readFileAsync = promisify(fs.readFile);
       const arrayBuffer = await response.arrayBuffer();
