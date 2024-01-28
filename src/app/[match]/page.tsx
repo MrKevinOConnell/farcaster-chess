@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import prisma from "./../../../prisma/client";
 import Link from "next/link";
-import { Chess } from "chess.js";
+
 import { Chessboard } from "react-chessboard";
 
 export const revalidate = 0;
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "fc:frame": "vNext",
       "fc:frame:image": `${process.env.NEXT_PUBLIC_URL}/api/image?gameId=KNevuQW1`,
       "fc:frame:button:1": "RSVP",
-      //   "fc:frame:post_url": `${process.env.HOST}/api/match`,
+      "fc:frame:post_url": `${process.env.HOST}/api/match`,
     },
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL ?? ""),
   };
@@ -39,12 +39,7 @@ export default async function Page({ params }: { params: { match: string } }) {
         className="col w-full border-2 border-slate-400 p-4"
         style={{ maxWidth: 540 }}
       >
-        <h1
-          className="text-xl font-bold text-slate-800"
-          style={{ fontSize: 36 }}
-        >
-          The best chess match ever
-        </h1>
+        {/* <Chessboard position={fen as string} /> */}
 
         <div></div>
       </div>
