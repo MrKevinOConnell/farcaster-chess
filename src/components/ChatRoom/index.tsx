@@ -80,10 +80,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
     }
   );
 
+  console.log("signerData", signerData);
+
   async function fetchSigner(): Promise<any | null> {
     try {
-      if (!profile || !profile?.fid) return null;
-      const endpoint = `/api/signer?user_id=${profile.fid}`;
+      if (!user || !user.fid) return null;
+      const endpoint = `/api/signer?user_id=${user.fid}`;
       const response = await fetcher(endpoint, {
         headers: { "Content-Type": "application/json" },
       });
@@ -145,7 +147,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
     <div className="flex flex-col w-full">
       {signerData &&
       signerData.signer_approval_url &&
-      signerData.status !== "approved" ? (
+      signerData.status === "approved" ? (
         <div className="  p-2 items-center justify-center w-full ">
           {" "}
           {/* Center the QR Code */}
