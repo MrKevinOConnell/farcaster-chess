@@ -1,4 +1,10 @@
 // @ts-ignore
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { NextApiRequest, NextApiResponse } from "next";
 import sharp from "sharp";
 import satori from "satori";
@@ -25,22 +31,27 @@ export default async function handler(
     const game = await prisma.lichessGame.findUnique({
       where: { id: gameId as string },
     });
-    console.log(game);
+
     if (!game) {
       throw new Error("Game not found");
     }
     let fen = game.completedFen;
     if (typeof fen === "undefined" || !fen) {
       try {
-        const response = await fetch(
-          `https://lichess.org/game/export/${gameId}`,
-          {
-            headers: { Accept: "application/json" },
-          }
-        );
+        const { gameId } = req.query; // Or however you obtain the game ID
+        const url = `https://lichess1.org/game/export/gif/white/${gameId}.gif?theme=brown&piece=cburnett`;
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch game data");
+        try {
+          const response = await fetch(url, { responseType: "arraybuffer" });
+          const gifBuffer = Buffer.from(response.data);
+
+          // Process the GIF with ImageMagick or similar
+          // Example: exec(`convert -some-options ${gifBuffer} output.gif`, ...);
+
+          // After processing, you can send the GIF back or save it and send a URL
+        } catch (error) {
+          console.error(error);
+          res.status(500).send("Error fetching or processing the GIF");
         }
 
         const gameData = await response.json();

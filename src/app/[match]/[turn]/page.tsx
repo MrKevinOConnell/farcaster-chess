@@ -1,37 +1,34 @@
 import { Metadata } from "next";
-import prisma from "./../../../prisma/client";
+import prisma from "../../../../prisma/client";
 import Link from "next/link";
-
-import { Chessboard } from "react-chessboard";
 
 export const revalidate = 0;
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { match: string; turn: string };
+}) {
   return {
     title: "Chess Match",
     description: "Chess is great",
     openGraph: {
       title: "Chess Match",
-      images: [`${process.env.NEXT_PUBLIC_URL}/api/image`],
+      images: [
+        `${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=${params.turn}`,
+      ],
     },
     other: {
       "fc:frame": "vNext",
-      "fc:frame:image": `${process.env.NEXT_PUBLIC_URL}/api/image?gameId=KNevuQW1`,
-      "fc:frame:button:1": "RSVP",
-      "fc:frame:post_url": `${process.env.HOST}/api/match`,
+      "fc:frame:image": `${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=${params.turn}`,
+      "fc:frame:button:1": "NEXT",
+      "fc:frame:post_url": `${process.env.HOST}/api/match?${params.match}&turn=${params.turn}`,
     },
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL ?? ""),
   };
 }
 
 export default async function Page({ params }: { params: { match: string } }) {
-  const game = (await prisma.lichessGame.findUnique({
-    where: { id: params.match },
-  })) as any;
-  if (!game) {
-    throw new Error("Game not found");
-  }
-
   return (
     <div className="col-fs-c w-full pt-20">
       <div
@@ -39,7 +36,7 @@ export default async function Page({ params }: { params: { match: string } }) {
         style={{ maxWidth: 540 }}
       >
         {/* <Chessboard position={fen as string} /> */}
-
+        <p>Chess</p>
         <div></div>
       </div>
     </div>
