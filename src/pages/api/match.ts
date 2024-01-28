@@ -39,15 +39,19 @@ export default async function handler(
                 <meta name="fc:frame:image" content="${
                   process.env.NEXT_PUBLIC_URL
                 }/api/image?gameId=${match}&turn=${turn}">
-                <meta name="fc:frame:button:1" content="Previous">
-                <meta name="fc:frame:button:2" content="Next">
+                <meta name="fc:frame:button:1" content="${
+                  newTurn !== 0 ? "PREVIOUS" : "NEXT"
+                }">
+               ${
+                 newTurn !== 0
+                   ? `<meta name="fc:frame:button:2" content="Next">`
+                   : ""
+               }
                 <meta name="fc:frame:post_url" content="${
                   process.env.NEXT_PUBLIC_URL
                 }/api/match?${match}&turn=${newTurn}&next=${
-        buttonIndex === 2
+        buttonIndex === 2 && newTurn !== 0
       }">,
-                
-                
             </head>
             <body>
                 <h1>Chess Game</h1>

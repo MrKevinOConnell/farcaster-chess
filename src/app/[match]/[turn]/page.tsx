@@ -21,8 +21,7 @@ export async function generateMetadata({
     other: {
       "fc:frame": "vNext",
       "fc:frame:image": `${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=${params.turn}`,
-      "fc:frame:button:1": "test",
-      "fc:frame:button:2": "NEXT",
+      "fc:frame:button:1": "NEXT",
       "fc:frame:post_url": `${process.env.NEXT_PUBLIC_URL}/api/match?match=${params.match}&turn=${params.turn}&next=true`,
     },
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL ?? ""),
