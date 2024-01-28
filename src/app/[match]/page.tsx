@@ -31,7 +31,11 @@ export default async function Page({ params }: { params: { match: string } }) {
   if (!game) {
     throw new Error("Game not found");
   }
-  let fen = game.completedFen;
+  let fen = null;
+
+  if (game && game.completedFen) {
+    fen = game.completedFen;
+  }
 
   return (
     <div className="col-fs-c w-full pt-20">
