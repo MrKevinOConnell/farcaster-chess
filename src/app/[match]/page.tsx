@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: { match: string } }) {
     throw new Error("Game not found");
   }
   let fen = null;
-  console.log(game);
+
   if (game && game.completedFen) {
     fen = game.completedFen;
   }
