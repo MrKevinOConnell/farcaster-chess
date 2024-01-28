@@ -111,22 +111,55 @@ export default async function handler(
     const imageURL = await checkFileExistsAndGetUrl("chess-png", supabasePath);
 
     if (imageURL) {
-      const data = await fetch(imageURL);
-      let imageBuffer = await data.arrayBuffer();
+      const response = await fetch(imageURL);
+      const imageBuffer = await response.arrayBuffer();
+      const base64Image = Buffer.from(imageBuffer).toString("base64");
+      const dataUrl = `data:image/png;base64,${base64Image}`; // Adjust the MIME type if necessary
 
-      // Resize the image using sharp
-      sharp(Buffer.from(imageBuffer))
-        .resize(100, 100) // Resize to 100x100 pixels
-        .toBuffer()
-        .then((resizedBuffer) => {
-          res.setHeader("Content-Type", "image/png");
-          res.setHeader("Cache-Control", "max-age=10");
-          res.send(resizedBuffer);
-        })
-        .catch((err) => {
-          console.error("Error processing image:", err);
-          res.status(500).send("Error processing image");
-        });
+      const svg = await satori(
+        <div
+          style={{
+            justifyContent: "flex-start",
+            alignItems: "center",
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "f4f4f4",
+            padding: 50,
+            lineHeight: 1.2,
+            fontSize: 24,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: 20,
+            }}
+          >
+            {/* Use the Data URL as the image source */}
+            <img src={dataUrl} width={150} height={100} />
+          </div>
+        </div>,
+        {
+          width: 600,
+          height: 400,
+          fonts: [
+            {
+              data: fontData,
+              name: "Roboto",
+              style: "normal",
+              weight: 400,
+            },
+          ],
+        }
+      );
+      const pngBuffer = await sharp(Buffer.from(svg))
+        .toFormat("png")
+        .toBuffer();
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "max-age=10");
+      res.send(pngBuffer);
       return;
     }
     const url = `https://lichess1.org/game/export/gif/white/${gameId}.gif?theme=brown&piece=cburnett`;
@@ -159,19 +192,53 @@ export default async function handler(
           contentType: "image/png",
         });
 
-      // Resize the image using sharp
-      sharp(Buffer.from(imageBuffer))
-        .resize(100, 100) // Resize to 100x100 pixels
-        .toBuffer()
-        .then((resizedBuffer) => {
-          res.setHeader("Content-Type", "image/png");
-          res.setHeader("Cache-Control", "max-age=10");
-          res.send(resizedBuffer);
-        })
-        .catch((err) => {
-          console.error("Error processing image:", err);
-          res.status(500).send("Error processing image");
-        });
+      const base64Image = Buffer.from(imageBuffer).toString("base64");
+      const dataUrl = `data:image/png;base64,${base64Image}`; // Adjust the MIME type if necessary
+
+      const svg = await satori(
+        <div
+          style={{
+            justifyContent: "flex-start",
+            alignItems: "center",
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "f4f4f4",
+            padding: 50,
+            lineHeight: 1.2,
+            fontSize: 24,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              padding: 20,
+            }}
+          >
+            {/* Use the Data URL as the image source */}
+            <img src={dataUrl} width={150} height={100} />
+          </div>
+        </div>,
+        {
+          width: 600,
+          height: 400,
+          fonts: [
+            {
+              data: fontData,
+              name: "Roboto",
+              style: "normal",
+              weight: 400,
+            },
+          ],
+        }
+      );
+      const pngBuffer = await sharp(Buffer.from(svg))
+        .toFormat("png")
+        .toBuffer();
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "max-age=10");
+      res.send(pngBuffer);
       const deleteFiles = await countAndDeleteGeneratedImages("/");
       console.log(`Deleted ${deleteFiles} files`);
 
