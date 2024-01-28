@@ -16,7 +16,7 @@ export default async function handler(
     try {
       const { buttonIndex } = req.body?.untrustedData;
       let newTurn = Number(turn);
-
+      console.log({ buttonIndex, newTurn });
       if (next === "true") {
         newTurn = newTurn + 1;
       } else {
@@ -54,11 +54,11 @@ export default async function handler(
                    ? `<meta name="fc:frame:button:2" content="NEXT">`
                    : ""
                }
-                <meta name="fc:frame:post_url" content="${
-                  process.env.NEXT_PUBLIC_URL
-                }/api/gameId?${gameId}&turn=${newTurn}&next=${
+               <meta name="fc:frame:post_url" content="${
+                 process.env.NEXT_PUBLIC_URL
+               }/api/match?gameId=${gameId}&turn=${newTurn}&next=${
         buttonIndex === 2 && newTurn !== 0
-      }">,
+      }">
             </head>
             <body>
                 <h1>Chess Game</h1>
