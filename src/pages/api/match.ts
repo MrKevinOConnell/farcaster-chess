@@ -11,7 +11,7 @@ export default async function handler(
   if (req.method === "POST") {
     const { gameId, turn, next } = req.query;
 
-    console.log({ match, turn, next });
+    console.log({ gameId, turn, next });
 
     try {
       const { buttonIndex } = req.body?.untrustedData;
