@@ -80,8 +80,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
     }
   );
 
-  console.log("signerData", signerData);
-
   async function fetchSigner(): Promise<any | null> {
     try {
       if (!user || !user.fid) return null;
