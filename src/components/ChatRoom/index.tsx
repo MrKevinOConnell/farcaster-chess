@@ -60,6 +60,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
     // Function to set up the channel
     async function setupChannel() {
       const hash = await getFarcasterThreadHash(gameId);
+
       setParentURL(hash);
 
       // Subscribe to the channel
@@ -75,6 +76,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
           },
           (payload) => {
             console.log("Change received!", payload);
+            if (!payload.new || !payload.new.farcasterThreadHash) return;
             setParentURL(payload.new.farcasterThreadHash);
           }
         )
@@ -118,15 +120,23 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
     return () => observer.disconnect();
   }, []);
 
+  let url;
+
+  if (!parentURL) {
+    url = undefined;
+  } else if (parentURL === chessChannel) {
+    url = `https://api.neynar.com/v2/farcaster/feed?feed_type=filter&filter_type=parent_url&parent_url=${encodeURIComponent(
+      parentURL
+    )}&with_recasts=false&with_replies=true&limit=25`;
+  } else {
+    url = `https://api.neynar.com/v1/farcaster/all-casts-in-thread?threadHash=${encodeURIComponent(
+      parentURL
+    )}`;
+  }
+
   const { data, error } = useSWR(
-    !parentURL || parentURL === chessChannel
-      ? `https://api.neynar.com/v2/farcaster/feed?feed_type=filter&filter_type=parent_url&parent_url=${encodeURIComponent(
-          parentURL
-        )}&with_recasts=false&with_replies=true&limit=25`
-      : `https://api.neynar.com/v1/farcaster/all-casts-in-thread?thread_hash=${encodeURIComponent(
-          parentURL
-        )}`,
-    async (url: any) =>
+    url,
+    async (url) =>
       await neynarFetcher(url, {
         accept: "application/json",
         api_key: process.env.NEXT_PUBLIC_NEYNAR_API_KEY,
@@ -190,8 +200,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
   if (!data) return <div>Loading...</div>;
   const messages = data.casts
     ? data.casts
-    : data.results && data.results.casts
-    ? data.results.casts
+    : data.result && data.result.casts
+    ? data.result.casts
     : [];
 
   const sendMessage = async () => {
@@ -230,7 +240,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
             <div className="flex">
               <img
                 className="w-8 h-8 rounded-full"
-                src={message.author.pfp_url}
+                src={message.author.pfp_url ?? message.author.pfp.url ?? ""}
               />
               <strong className="font-semibold">
                 <span className="font-medium opacity-50">
