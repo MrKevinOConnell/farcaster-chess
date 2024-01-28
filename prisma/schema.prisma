@@ -39,13 +39,16 @@ model LichessInfo {
 }
 
 model LichessGame {
-  id                  String             @id @unique
-  farcasterThreadHash String
-  gameStatus          String?
-  gameResult          String?
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @default(now()) @updatedAt
-  LichessGameCasts    LichessGameCasts[]
+  id                   String             @id @unique
+  farcasterThreadHash  String
+  gameStatus           String?
+  gameResult           String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @default(now()) @updatedAt
+  LichessGameCasts     LichessGameCasts[]
+  completedFen         String?
+  playerOneLichessName String?
+  playerTwoLichessName String?
 
   @@map("lichess_games")
 }
