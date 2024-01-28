@@ -55,7 +55,9 @@ export default async function handler(
             </html>
           `);
     } catch (e: unknown) {
+      console.log(e);
       // @ts-expect-error
+
       return res.status(400).send(`Failed to validate message: ${e.message}`);
     }
   } else {
