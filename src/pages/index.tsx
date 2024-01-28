@@ -220,6 +220,20 @@ export default function Home() {
           updateLichessModal(false);
         } else if (obj.status === "gameFinish") {
           setGameStatus("ended");
+          //check if user won
+          if (obj.winner === user.lichessName) {
+            //user won
+            const win = new Audio("/win.mp3");
+            win.play();
+          } else if (obj.winner === "draw") {
+            //draw
+            const win = new Audio("/win.mp3");
+            win.play();
+          } else {
+            const lose = new Audio("/loss.mp3");
+            lose.play();
+            //user lost
+          }
         } else if (obj.type === "challenge") {
           //CHALLENGE ADDED
           setChallenges((prev: any) => [
@@ -303,7 +317,6 @@ export default function Home() {
       const normalMove = new Audio("/move.mp3");
       normalMove.play();
     }
-
     // Update the game state
     setCurrentGame(chess);
   };
