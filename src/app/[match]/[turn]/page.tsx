@@ -36,7 +36,10 @@ export default async function Page({ params }: { params: { match: string } }) {
         style={{ maxWidth: 540 }}
       >
         {/* <Chessboard position={fen as string} /> */}
-        <p>Chess</p>
+        <img
+          className="w-full"
+          src={`${process.env.NEXT_PUBLIC_URL}/api/image?gameId=${params.match}&turn=0`}
+        />
         <div></div>
       </div>
     </div>
