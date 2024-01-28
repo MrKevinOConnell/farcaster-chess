@@ -1,7 +1,7 @@
 import { Chessboard } from "react-chessboard";
 import { Button, Flex, Stack } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Chess, Piece, Square } from "chess.js";
 
@@ -51,6 +51,11 @@ export default function Home() {
     null
   );
   const [currentGame, setCurrentGame] = useState(new Chess());
+
+  const currentTurnNumber = useMemo(() => {
+    if (!currentGame || !currentGame.history) return 0;
+    return currentGame.history().length;
+  }, [currentGame]);
 
   useEffect(() => {
     let timer: any;
@@ -483,7 +488,7 @@ export default function Home() {
       </div>
 
       <div className="w-11/12 max-w-sm">
-        <ChatRoom gameId={currentGameId} gameState={currentGame.fen()} />
+        <ChatRoom gameId={currentGameId} turnNumber={currentTurnNumber} />
       </div>
     </div>
   );

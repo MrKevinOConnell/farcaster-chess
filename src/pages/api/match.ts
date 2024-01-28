@@ -15,6 +15,7 @@ export default async function handler(
 
     try {
       const { buttonIndex } = req.body?.untrustedData;
+      console.log("body", req.body?.untrustedData);
       let newTurn = Number(turn);
       console.log({ buttonIndex, newTurn });
       if (next === "true") {

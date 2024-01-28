@@ -27,10 +27,10 @@ type Message = {
 // Define a type for the component's props
 type ChatRoomProps = {
   gameId: string | null;
-  gameState: string;
+  turnNumber: number;
 };
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
   const { isAuthenticated, profile } = useProfile();
   const [newMessage, setNewMessage] = useState("");
   const [parentURL, setParentURL] = useState(chessChannel);
@@ -47,7 +47,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
         .eq("id", gameId)
         .single();
 
-      const hash = data ? data.farcasterThreadHash ?? chessChannel : null;
+      const hash = data ? data.farcasterThreadHash : chessChannel;
 
       return hash;
     } catch (err) {
@@ -75,7 +75,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
             filter: `id=eq.${gameId}`,
           },
           (payload) => {
-            console.log("Change received!", payload);
             if (!payload.new || !payload.new.farcasterThreadHash) return;
             setParentURL(payload.new.farcasterThreadHash);
           }
@@ -207,7 +206,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
   const sendMessage = async () => {
     if (newMessage.trim() !== "") {
       const fid = user.fid.toString();
-      await sendGameCast(newMessage, fid, gameId, gameState);
+      let finishedMessage = newMessage.trim();
+      if (gameId) {
+        finishedMessage += `\n ${process.env.NEXT_PUBLIC_URL}/${gameId}/${turnNumber}`;
+      }
+      await sendGameCast(finishedMessage, fid, gameId, turnNumber);
       setNewMessage(""); // Reset input after sending
     }
   };

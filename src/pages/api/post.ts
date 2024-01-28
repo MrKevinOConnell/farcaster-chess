@@ -23,8 +23,8 @@ export default async function handler(
   if (req.method === "POST") {
     //FEN
 
-    const { user_id, text, game_id, game_state } = req.body;
-
+    let { user_id, text, game_id, turn_number } = req.body;
+    turn_number = parseInt(turn_number);
     try {
       // Get signer_uuid for the given userId
       const signerUuid = await getSignerUuidForUserId(user_id.toString());
@@ -34,7 +34,7 @@ export default async function handler(
       }
       let parent = chessChannel;
       let game = null;
-      if (game_id && game_state) {
+      if (game_id && turn_number) {
         game = await prisma.lichessGame.findUnique({
           where: { id: game_id as string },
         });
@@ -65,7 +65,7 @@ export default async function handler(
       }
 
       const data = await response.json();
-      if (!game_id || !game_state) {
+      if (!game_id || !turn_number) {
         return res.status(200).json(data);
       }
 
@@ -93,7 +93,7 @@ export default async function handler(
           id: data.cast.hash as string,
           userFid: user_id.toString() as string,
           gameId: game_id as string,
-          gameState: game_state as string,
+          turnNumber: turn_number,
           text: text,
           castIndex: castIndex, // Include the cast index
         },

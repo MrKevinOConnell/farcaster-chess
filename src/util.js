@@ -69,7 +69,7 @@ export const sendCast = async (text, user_id) => {
   } catch (err) {}
 };
 // const { user_id, text, game_id, full_game_id, game_state } = req.body;
-export const sendGameCast = async (text, user_id, game_id, game_state) => {
+export const sendGameCast = async (text, user_id, game_id, turn_number) => {
   try {
     const res = await fetch("/api/post", {
       method: "POST",
@@ -80,7 +80,7 @@ export const sendGameCast = async (text, user_id, game_id, game_state) => {
         text,
         user_id,
         game_id,
-        game_state,
+        turn_number,
         // Your request body here
       }),
     });
