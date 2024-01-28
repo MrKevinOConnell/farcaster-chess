@@ -359,6 +359,7 @@ export default function Home() {
     targetSquare: Square,
     piece: any
   ) => {
+    if (!currentGameId) return false;
     // Create a move object
     const move = { from: sourceSquare, to: targetSquare, piece: piece };
     let uciMove = sourceSquare + targetSquare;
