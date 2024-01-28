@@ -72,7 +72,7 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 function convertImage(filePath: string) {
   return new Promise((resolve, reject) => {
     im.convert(
-      [filePath, "-coalesce", "-resize", "50x50", "+adjoin", "%d.png"],
+      [filePath, "-coalesce", "+adjoin", "%d.png"],
       function (err, stdout) {
         if (err) {
           console.error("Error:", err);
@@ -113,10 +113,20 @@ export default async function handler(
     if (imageURL) {
       const data = await fetch(imageURL);
       let imageBuffer = await data.arrayBuffer();
-      imageBuffer = Buffer.from(imageBuffer);
-      res.setHeader("Content-Type", "image/png");
-      res.setHeader("Cache-Control", "max-age=10");
-      res.send(imageBuffer);
+
+      // Resize the image using sharp
+      sharp(Buffer.from(imageBuffer))
+        .resize(100, 100) // Resize to 100x100 pixels
+        .toBuffer()
+        .then((resizedBuffer) => {
+          res.setHeader("Content-Type", "image/png");
+          res.setHeader("Cache-Control", "max-age=10");
+          res.send(resizedBuffer);
+        })
+        .catch((err) => {
+          console.error("Error processing image:", err);
+          res.status(500).send("Error processing image");
+        });
       return;
     }
     const url = `https://lichess1.org/game/export/gif/white/${gameId}.gif?theme=brown&piece=cburnett`;
@@ -149,9 +159,19 @@ export default async function handler(
           contentType: "image/png",
         });
 
-      res.setHeader("Content-Type", "image/png");
-      res.setHeader("Cache-Control", "max-age=10");
-      res.send(imageBuffer);
+      // Resize the image using sharp
+      sharp(Buffer.from(imageBuffer))
+        .resize(100, 100) // Resize to 100x100 pixels
+        .toBuffer()
+        .then((resizedBuffer) => {
+          res.setHeader("Content-Type", "image/png");
+          res.setHeader("Cache-Control", "max-age=10");
+          res.send(resizedBuffer);
+        })
+        .catch((err) => {
+          console.error("Error processing image:", err);
+          res.status(500).send("Error processing image");
+        });
       const deleteFiles = await countAndDeleteGeneratedImages("/");
       console.log(`Deleted ${deleteFiles} files`);
 
