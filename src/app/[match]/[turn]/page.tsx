@@ -28,7 +28,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { params: { match: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: { match: string; turn: string };
+}) {
   return (
     <div className="col-fs-c w-full pt-20">
       <div
