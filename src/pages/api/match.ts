@@ -13,14 +13,14 @@ export default async function handler(
     console.log({ match, turn });
 
     try {
-      const { hash } = req.body?.untrustedData.castId;
-      const { buttonIndex, fid } = req.body?.untrustedData;
+      const { buttonIndex } = req.body?.untrustedData;
       let newTurn = Number(turn) + (next ? 1 : -1);
-      console.log({ fid, hash });
+      console.log({ buttonIndex, newTurn });
+      // console.log({ fid, hash });
 
-      if (!fid || !hash) {
-        return res.status(400).send("Invalid message");
-      }
+      // if (!fid || !hash) {
+      //   return res.status(400).send("Invalid message");
+      // }
       /*
     <meta name="fc:frame:button:1" content="Previous">
                 <meta name="fc:frame:button:2" content="Next">
@@ -42,7 +42,7 @@ export default async function handler(
                 <meta name="fc:frame:button:1" content="Previous">
                 <meta name="fc:frame:button:2" content="Next">
                 <meta name="fc:frame:post_url" content="${
-                  process.env.HOST
+                  process.env.NEXT_PUBLIC_URL
                 }/api/match?${match}&turn=${newTurn}&next=${
         buttonIndex === 2
       }">,
