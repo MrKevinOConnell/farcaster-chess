@@ -13,6 +13,14 @@ import prisma from "./../../../prisma/client";
 import im from "imagemagick";
 const unlinkAsync = promisify(fs.unlink);
 
+const mkdir = promisify(fs.mkdir);
+
+async function ensureDirectoryExists(directory: string) {
+  if (!fs.existsSync(directory)) {
+    await mkdir(directory, { recursive: true });
+  }
+}
+
 async function countAndDeleteGeneratedImages(filePath: any) {
   const directory = filePath.substring(0, filePath.lastIndexOf("/")) || ".";
   let counter = 0;
@@ -29,7 +37,8 @@ async function countAndDeleteGeneratedImages(filePath: any) {
         break; // Exit the loop if there is an error in deleting a file
       }
     } else {
-      break; // No more files found, exit the loop
+      await unlinkAsync("tmp/image.gif");
+      break;
     }
   }
 
@@ -72,7 +81,7 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 function convertImage(filePath: string) {
   return new Promise((resolve, reject) => {
     im.convert(
-      [filePath, "-coalesce", "+adjoin", "%d.png"],
+      [filePath, "-coalesce", "+adjoin", "tmp/%d.png"],
       function (err, stdout) {
         if (err) {
           console.error("Error:", err);
@@ -173,16 +182,18 @@ export default async function handler(
       if (!response.ok) {
         throw new Error(`Error fetching GIF: ${response.statusText}`);
       }
+      const directory = "tmp"; // Or the correct path to your directory
+      await ensureDirectoryExists(directory);
       const writeFile = promisify(fs.writeFile);
       const readFileAsync = promisify(fs.readFile);
       const arrayBuffer = await response.arrayBuffer();
       const gifBuffer = Buffer.from(arrayBuffer);
-      const filePath = "/tmp/image.gif";
+      const filePath = "tmp/image.gif";
       const write = await writeFile(filePath, gifBuffer);
 
       const image = await convertImage(filePath);
 
-      const imageFrame = `/tmp/${turn ?? "0"}.png`;
+      const imageFrame = `tmp/${turn ?? "0"}.png`;
       // Check if the file exists before attempting to read
       if (!fs.existsSync(imageFrame)) {
         throw new Error(`File not found: ${imageFrame}`);
@@ -247,8 +258,8 @@ export default async function handler(
       res.setHeader("Content-Type", "image/png");
       res.setHeader("Cache-Control", "max-age=10");
       res.send(pngBuffer);
-      const deleteFiles = await countAndDeleteGeneratedImages("/");
-      console.log(`Deleted ${deleteFiles} files`);
+      const deleteFiles = await countAndDeleteGeneratedImages("tmp/");
+      // console.log(`Deleted ${deleteFiles} files`);
 
       return;
 
