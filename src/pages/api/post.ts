@@ -69,25 +69,35 @@ export default async function handler(
         return res.status(200).json(data);
       }
 
-      if (!game && data) {
-        const newGame = await prisma.lichessGame.create({
+      let castIndex = 0;
+      if (game) {
+        // Count existing casts to determine the new cast index
+        const castCount = await prisma.lichessGameCasts.count({
+          where: { gameId: game_id },
+        });
+        castIndex = castCount;
+      }
+
+      if (!game) {
+        await prisma.lichessGame.create({
           data: {
             id: game_id,
             farcasterThreadHash: data.cast.hash,
           },
         });
-        const newCast = await prisma.lichessGameCasts.create({
-          data: {
-            id: data.cast.hash as string,
-            userFid: user_id.toString() as string,
-            gameId: game_id as string,
-            gameState: game_state as string,
-            text: text,
-          },
-        });
-
-        console.log({ newGame, newCast });
       }
+
+      // Create a new cast with the calculated castIndex
+      const newCast = await prisma.lichessGameCasts.create({
+        data: {
+          id: data.cast.hash as string,
+          userFid: user_id.toString() as string,
+          gameId: game_id as string,
+          gameState: game_state as string,
+          text: text,
+          castIndex: castIndex, // Include the cast index
+        },
+      });
 
       res.status(200).json(data);
     } catch (error) {

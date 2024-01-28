@@ -56,6 +56,7 @@ model LichessGameCasts {
   gameId    String
   gameState String?
   text      String?
+  castIndex Int // New field to store the index of the cast in the game
   createdAt DateTime    @default(now())
   updatedAt DateTime    @default(now()) @updatedAt
   game      LichessGame @relation(fields: [gameId], references: [id])
