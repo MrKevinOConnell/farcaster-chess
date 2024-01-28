@@ -14,7 +14,12 @@ export default async function handler(
 
     try {
       const { buttonIndex } = req.body?.untrustedData;
-      let newTurn = Number(turn) + (next ? 1 : -1);
+      let newTurn = Number(turn);
+      if (buttonIndex === 1 && newTurn !== 0) {
+        newTurn = newTurn - 1;
+      } else {
+        newTurn = newTurn + 1;
+      }
       console.log({ buttonIndex, newTurn });
       // console.log({ fid, hash });
 
@@ -55,7 +60,9 @@ export default async function handler(
             </head>
             <body>
                 <h1>Chess Game</h1>
-              <img src="${process.env.NEXT_PUBLIC_URL}/api/image" />
+              <img src="${
+                process.env.NEXT_PUBLIC_URL
+              }/api/image?gameId=${match}&turn=${turn}" />
             </html>
           `);
     } catch (e: unknown) {
