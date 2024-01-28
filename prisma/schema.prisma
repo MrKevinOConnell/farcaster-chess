@@ -38,6 +38,31 @@ model LichessInfo {
   @@map("lichess_info")
 }
 
+model LichessGame {
+  id                  String             @id @unique
+  farcasterThreadHash String
+  gameStatus          String?
+  gameResult          String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+  LichessGameCasts    LichessGameCasts[]
+
+  @@map("lichess_games")
+}
+
+model LichessGameCasts {
+  id        String      @id
+  userFid   String
+  gameId    String
+  gameState String?
+  text      String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now()) @updatedAt
+  game      LichessGame @relation(fields: [gameId], references: [id])
+
+  @@map("lichess_game_casts")
+}
+
 model NeynarInfo {
   id                  String   @id @default(uuid())
   deadline            Int

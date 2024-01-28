@@ -47,6 +47,9 @@ export default function Home() {
   const [currentGameData, setCurrentGameData] = useState<any>(null); // [gameId, isUserPlaying
   const [games, setGames] = useState<any>([]);
   const [currentGameId, setCurrentGameId] = useState<null | string>(null);
+  const [currentFullGameId, setCurrentFullGameId] = useState<null | string>(
+    null
+  );
   const [currentGame, setCurrentGame] = useState(new Chess());
 
   useEffect(() => {
@@ -215,7 +218,7 @@ export default function Home() {
               return challenge.gameId !== obj.game.id;
             });
           });
-          setCurrentGameId(obj.id);
+          setCurrentGameId(obj.gameId);
           updateStoreModal && updateStoreModal(false);
           updateLichessModal(false);
         } else if (obj.status === "gameFinish") {
@@ -479,7 +482,7 @@ export default function Home() {
       </div>
 
       <div className="w-11/12 max-w-sm">
-        <ChatRoom gameId={currentGameId} />
+        <ChatRoom gameId={currentGameId} gameState={currentGame.fen()} />
       </div>
     </div>
   );

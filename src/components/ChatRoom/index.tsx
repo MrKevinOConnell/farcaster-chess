@@ -1,6 +1,12 @@
 // ChatRoom.tsx
-import { fetcher, neynarFetcher, sendCast } from "@/util";
-import React, { useEffect, useRef, useState } from "react";
+import { fetcher, neynarFetcher, sendGameCast } from "@/util";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import useSWR from "swr";
 import "@farcaster/auth-kit/styles.css";
 import QRCode from "react-qr-code";
@@ -10,6 +16,7 @@ import { getRelativeTime } from "@/utils/timeUtils";
 import { encode } from "punycode";
 import { useStore } from "@/store";
 import { chessChannel } from "@/constants";
+import supabase from "@/db";
 
 // Define a type for the message object
 type Message = {
@@ -20,21 +27,74 @@ type Message = {
 // Define a type for the component's props
 type ChatRoomProps = {
   gameId: string | null;
+  gameState: string;
 };
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
   const { isAuthenticated, profile } = useProfile();
   const [newMessage, setNewMessage] = useState("");
+  const [parentURL, setParentURL] = useState(chessChannel);
   const user = useStore((state: any) => state.user);
 
-  const [parentURL, setParentURL] = useState("");
+  async function getFarcasterThreadHash(gameId: string | null) {
+    if (!gameId) {
+      return chessChannel;
+    }
+    try {
+      const { data, error } = await supabase
+        .from("lichess_games")
+        .select("farcasterThreadHash")
+        .eq("id", gameId)
+        .single();
+
+      const hash = data ? data.farcasterThreadHash ?? chessChannel : null;
+
+      return hash;
+    } catch (err) {
+      console.log(err);
+      return chessChannel;
+    }
+  }
 
   useEffect(() => {
-    if (gameId) {
-      setParentURL(`${chessChannel}${gameId}`);
-    } else {
-      setParentURL(`${chessChannel}`);
+    // Function to set up the channel
+    async function setupChannel() {
+      const hash = await getFarcasterThreadHash(gameId);
+      setParentURL(hash);
+
+      // Subscribe to the channel
+      const channel = supabase
+        .channel("schema-db-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "lichess_games",
+            // filter: `id = ${gameId}`,
+          },
+          (payload) => {
+            console.log("Change received!", payload);
+            setParentURL(payload.new.farcasterThreadHash);
+          }
+        )
+        .subscribe((event) => console.log("Received event!", event));
+
+      return channel;
     }
+
+    // Set up the channel and get the unsubscribe function
+    let channelA: any;
+    setupChannel().then((channel) => {
+      channelA = channel;
+    });
+
+    // Cleanup function for unsubscription
+    return () => {
+      if (channelA) {
+        supabase.removeChannel(channelA);
+      }
+    };
   }, [gameId]);
 
   const chatContainerRef = useRef(null);
@@ -59,13 +119,17 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
   }, []);
 
   const { data, error } = useSWR(
-    `https://api.neynar.com/v2/farcaster/feed?feed_type=filter&filter_type=parent_url&parent_url=${encodeURIComponent(
-      parentURL
-    )}&with_recasts=false&with_replies=true&limit=25`,
-    async (url) =>
+    !parentURL || parentURL === chessChannel
+      ? `https://api.neynar.com/v2/farcaster/feed?feed_type=filter&filter_type=parent_url&parent_url=${encodeURIComponent(
+          parentURL
+        )}&with_recasts=false&with_replies=true&limit=25`
+      : `https://api.neynar.com/v1/farcaster/all-casts-in-thread?thread_hash=${encodeURIComponent(
+          parentURL
+        )}`,
+    async (url: any) =>
       await neynarFetcher(url, {
         accept: "application/json",
-        api_key: process.env.NEXT_PUBLIC_NEYNAR_API_KEY, // Ensure this environment variable is set
+        api_key: process.env.NEXT_PUBLIC_NEYNAR_API_KEY,
       }),
     {
       refreshInterval: 2500,
@@ -124,11 +188,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
 
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
-  const messages = data.casts ?? [];
+  const messages = data.casts
+    ? data.casts
+    : data.results && data.results.casts
+    ? data.results.casts
+    : [];
 
   const sendMessage = async () => {
     if (newMessage.trim() !== "") {
-      await sendCast(newMessage, user.fid, parentURL);
+      const fid = user.fid.toString();
+      await sendGameCast(newMessage, fid, gameId, gameState);
       setNewMessage(""); // Reset input after sending
     }
   };

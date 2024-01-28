@@ -47,7 +47,7 @@ export async function readNeynarStream(stream) {
   return Buffer.concat(chunks).toString("utf8");
 }
 
-export const sendCast = async (text, user_id, parent_url) => {
+export const sendCast = async (text, user_id) => {
   try {
     const res = await fetch("/api/post", {
       method: "POST",
@@ -57,11 +57,33 @@ export const sendCast = async (text, user_id, parent_url) => {
       body: JSON.stringify({
         text,
         user_id,
-        parent_url,
         // Your request body here
       }),
     });
 
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+
+    const data = await res.json();
+  } catch (err) {}
+};
+// const { user_id, text, game_id, full_game_id, game_state } = req.body;
+export const sendGameCast = async (text, user_id, game_id, game_state) => {
+  try {
+    const res = await fetch("/api/post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        user_id,
+        game_id,
+        game_state,
+        // Your request body here
+      }),
+    });
     if (!res.ok) {
       throw new Error(`Error: ${res.status}`);
     }

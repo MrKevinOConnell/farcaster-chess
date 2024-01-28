@@ -2,6 +2,7 @@
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../prisma/client";
+import { chessChannel } from "@/constants";
 // Assuming a function that gets signer_uuid based on userId
 // Replace this with your actual logic
 async function getSignerUuidForUserId(user_id: string): Promise<string | null> {
@@ -20,7 +21,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { user_id, text, parent_url } = req.body;
+    //FEN
+
+    const { user_id, text, game_id, game_state } = req.body;
 
     try {
       // Get signer_uuid for the given userId
@@ -29,13 +32,22 @@ export default async function handler(
       if (!signerUuid) {
         throw new Error("Signer UUID not found for the given user ID.");
       }
+      let parent = chessChannel;
+      let game = null;
+      if (game_id && game_state) {
+        game = await prisma.lichessGame.findUnique({
+          where: { id: game_id as string },
+        });
+        if (game) {
+          parent = game.farcasterThreadHash;
+        }
+      }
 
       // Update request body with signer_uuid
       const requestBody = {
         signer_uuid: signerUuid,
         text: text,
-        parent: parent_url,
-        channel_id: "chess",
+        parent,
       };
 
       const response = await fetch("https://api.neynar.com/v2/farcaster/cast", {
@@ -53,6 +65,29 @@ export default async function handler(
       }
 
       const data = await response.json();
+      if (!game_id || !game_state) {
+        return res.status(200).json(data);
+      }
+
+      if (!game && data) {
+        const newGame = await prisma.lichessGame.create({
+          data: {
+            id: game_id,
+            farcasterThreadHash: data.cast.hash,
+          },
+        });
+        const newCast = await prisma.lichessGameCasts.create({
+          data: {
+            id: data.cast.hash as string,
+            userFid: user_id.toString() as string,
+            gameId: game_id as string,
+            gameState: game_state as string,
+            text: text,
+          },
+        });
+
+        console.log({ newGame, newCast });
+      }
 
       res.status(200).json(data);
     } catch (error) {
