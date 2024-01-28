@@ -9,16 +9,18 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { match, turn, next } = req.query;
-    console.log({ match, turn });
+    const { gameId, turn, next } = req.query;
+
+    console.log({ match, turn, next });
 
     try {
       const { buttonIndex } = req.body?.untrustedData;
       let newTurn = Number(turn);
-      if (buttonIndex === 1 && newTurn !== 0) {
-        newTurn = newTurn - 1;
-      } else {
+
+      if (next === "true") {
         newTurn = newTurn + 1;
+      } else {
+        newTurn = newTurn - 1;
       }
       console.log({ buttonIndex, newTurn });
       // console.log({ fid, hash });
@@ -39,11 +41,11 @@ export default async function handler(
                 <meta property="og:title" content="Chess Game">
                 <meta property="og:image" content="${
                   process.env.NEXT_PUBLIC_URL
-                }/api/image?gameId=${match}&turn=${turn}">
+                }/api/image?gameId=${gameId}&turn=${turn}">
                 <meta name="fc:frame" content="vNext">
                 <meta name="fc:frame:image" content="${
                   process.env.NEXT_PUBLIC_URL
-                }/api/image?gameId=${match}&turn=${turn}">
+                }/api/image?gameId=${gameId}&turn=${turn}">
                 <meta name="fc:frame:button:1" content="${
                   newTurn !== 0 ? "PREVIOUS" : "NEXT"
                 }">
@@ -54,7 +56,7 @@ export default async function handler(
                }
                 <meta name="fc:frame:post_url" content="${
                   process.env.NEXT_PUBLIC_URL
-                }/api/match?${match}&turn=${newTurn}&next=${
+                }/api/match?${gameId}&turn=${newTurn}&next=${
         buttonIndex === 2 && newTurn !== 0
       }">,
             </head>
@@ -62,7 +64,7 @@ export default async function handler(
                 <h1>Chess Game</h1>
               <img src="${
                 process.env.NEXT_PUBLIC_URL
-              }/api/image?gameId=${match}&turn=${turn}" />
+              }/api/image?gameId=${gameId}&turn=${turn}" />
             </html>
           `);
     } catch (e: unknown) {
