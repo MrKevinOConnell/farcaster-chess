@@ -25,16 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page({ params }: { params: { match: string } }) {
-  const game = await prisma.lichessGame.findUnique({
+  const game = (await prisma.lichessGame.findUnique({
     where: { id: params.match },
-  });
+  })) as any;
   if (!game) {
     throw new Error("Game not found");
-  }
-  let fen = null;
-
-  if (game && game.completedFen) {
-    fen = game.completedFen;
   }
 
   return (
