@@ -142,11 +142,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId }) => {
   };
 
   return (
-    <div className="flex flex-col  w-full">
+    <div className="flex flex-col w-full">
       {signerData &&
       signerData.signer_approval_url &&
       signerData.status !== "approved" ? (
-        <div className="absolute top-1/2 left-1/2 border-2 border-slate-100 bg-gray-200 p-2   -translate-x-1/2 -translate-y-1/2">
+        <div className="  p-2 items-center justify-center w-full ">
           {" "}
           {/* Center the QR Code */}
           <QRCode size={256} value={signerData.signer_approval_url} />
