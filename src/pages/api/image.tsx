@@ -258,7 +258,7 @@ export default async function handler(
       res.setHeader("Content-Type", "image/png");
       res.setHeader("Cache-Control", "max-age=10");
       res.send(pngBuffer);
-      const deleteFiles = await countAndDeleteGeneratedImages("tmp/");
+      // const deleteFiles = await countAndDeleteGeneratedImages("tmp/");
       // console.log(`Deleted ${deleteFiles} files`);
 
       return;
