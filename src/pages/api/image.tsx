@@ -30,7 +30,7 @@ export default async function handler(
       throw new Error("Game not found");
     }
     let fen = game.completedFen;
-    if (!fen) {
+    if (typeof fen === "undefined" || !fen) {
       try {
         const response = await fetch(
           `https://lichess.org/game/export/${gameId}`,
