@@ -8,8 +8,8 @@ export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Eventcaster RSVP test",
-    description: "Test event",
+    title: "Chess Match",
+    description: "Chess is great",
     openGraph: {
       title: "Chess Match",
       images: [`${process.env.NEXT_PUBLIC_URL}/api/image`],
@@ -25,7 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page({ params }: { params: { match: string } }) {
-  console.log("params", params);
   const game = await prisma.lichessGame.findUnique({
     where: { id: params.match },
   });
@@ -33,33 +32,7 @@ export default async function Page({ params }: { params: { match: string } }) {
     throw new Error("Game not found");
   }
   let fen = game.completedFen;
-  // if (!fen) {
-  //   try {
-  //     const response = await fetch(
-  //       `https://lichess.org/game/export/${params.match}`,
-  //       {
-  //         headers: { Accept: "application/json" },
-  //       }
-  //     );
 
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch game data");
-  //     }
-
-  //     const gameData = await response.json();
-  //     const gameFen = gameData.moves
-  //       .map((move: any) => move.san)
-  //       .join(" ")
-  //       .trim();
-  //     await prisma.lichessGame.update({
-  //       where: { id: params.match },
-  //       data: { completedFen: gameFen },
-  //     });
-  //     fen = gameFen;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //}
   return (
     <div className="col-fs-c w-full pt-20">
       <div

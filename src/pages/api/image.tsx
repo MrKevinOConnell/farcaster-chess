@@ -17,12 +17,14 @@ export default async function handler(
 ) {
   try {
     const { gameId } = req.query;
+    console.log("gameId", gameId);
     if (!gameId) {
       throw new Error("Game ID not provided");
     }
     const game = await prisma.lichessGame.findUnique({
       where: { id: gameId as string },
     });
+    console.log(game);
     if (!game) {
       throw new Error("Game not found");
     }
@@ -41,6 +43,7 @@ export default async function handler(
         }
 
         const gameData = await response.json();
+        console.log(gameData);
         const gameFen = gameData.moves
           .map((move: any) => move.san)
           .join(" ")
