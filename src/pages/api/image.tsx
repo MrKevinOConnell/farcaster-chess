@@ -134,16 +134,20 @@ export default async function handler(
             style={{
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+
+              justifyContent: "center",
               padding: 20,
             }}
           >
             {/* Use the Data URL as the image source */}
-            <img src={dataUrl} width={150} height={100} />
+            <img src={dataUrl} width={225} />
           </div>
         </div>,
         {
-          width: 600,
-          height: 400,
+          width: 500,
+          height: 300,
           fonts: [
             {
               data: fontData,
@@ -213,16 +217,20 @@ export default async function handler(
             style={{
               display: "flex",
               flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+
+              justifyContent: "center",
               padding: 20,
             }}
           >
             {/* Use the Data URL as the image source */}
-            <img src={dataUrl} width={150} height={100} />
+            <img src={dataUrl} width={225} />
           </div>
         </div>,
         {
-          width: 600,
-          height: 400,
+          width: 500,
+          height: 300,
           fonts: [
             {
               data: fontData,
