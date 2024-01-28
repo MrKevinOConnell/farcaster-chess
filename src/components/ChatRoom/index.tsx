@@ -208,7 +208,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
       const fid = user.fid.toString();
       let finishedMessage = newMessage.trim();
       if (gameId) {
-        finishedMessage += `\n ${process.env.NEXT_PUBLIC_URL}/${gameId}/${turnNumber}`;
+        finishedMessage += `\n${process.env.NEXT_PUBLIC_URL}/${gameId}/${turnNumber}`;
       }
       await sendGameCast(finishedMessage, fid, gameId, turnNumber);
       setNewMessage(""); // Reset input after sending
