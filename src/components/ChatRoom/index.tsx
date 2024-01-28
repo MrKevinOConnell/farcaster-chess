@@ -71,7 +71,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, gameState }) => {
             event: "INSERT",
             schema: "public",
             table: "lichess_games",
-            // filter: `id = ${gameId}`,
+            filter: `id=eq.${gameId}`,
           },
           (payload) => {
             console.log("Change received!", payload);
