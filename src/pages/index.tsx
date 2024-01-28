@@ -299,11 +299,9 @@ export default function Home() {
     if (lastMove && lastMove.captured) {
       const capturedPiece = new Audio("/capture.mp3");
       capturedPiece.play();
-      console.log("The last move was a capture:", lastMove);
     } else {
       const normalMove = new Audio("/move.mp3");
       normalMove.play();
-      console.log("The last move was not a capture.");
     }
 
     // Update the game state
