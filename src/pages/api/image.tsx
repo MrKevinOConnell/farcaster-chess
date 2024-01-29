@@ -14,6 +14,7 @@ import prisma from "./../../../prisma/client";
 import im from "imagemagick";
 import * as gif from "gif-frames";
 const unlinkAsync = promisify(fs.unlink);
+const supabaseBucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
 
 const mkdir = promisify(fs.mkdir);
 
@@ -120,7 +121,10 @@ export default async function handler(
   try {
     const { gameId } = req.query; // Or however you obtain the game ID
     let supabasePath = `${gameId}/${turn ?? "0"}.png`;
-    const imageURL = await checkFileExistsAndGetUrl("chess-png", supabasePath);
+    const imageURL = await checkFileExistsAndGetUrl(
+      supabaseBucket,
+      supabasePath
+    );
 
     if (imageURL) {
       const response = await fetch(imageURL);
@@ -211,7 +215,7 @@ export default async function handler(
       const imageBuffer = await readFileAsync(imageFrame);
 
       const { data, error } = await supabase.storage
-        .from("chess-png")
+        .from(supabaseBucket)
         .upload(supabasePath, imageBuffer, {
           contentType: "image/png",
         });
