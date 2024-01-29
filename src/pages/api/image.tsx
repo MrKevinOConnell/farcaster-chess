@@ -75,17 +75,47 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
   }
 };
 
-function convertImage(filePath: any) {
+function convertAndUploadImage(filePath: string, gameId: string, turn: any) {
   return new Promise((resolve, reject) => {
+    const outputDir = `${os.tmpdir()}/`;
     im.convert(
-      [filePath, "-coalesce", "+adjoin", `${os.tmpdir()}/%d.png`],
-      (err: any, stdout: any) => {
+      [filePath, "-coalesce", "+adjoin", `${outputDir}%d.png`],
+      async (err: any, stdout: any) => {
         if (err) {
           console.log(`Error converting image ${filePath}:`, err);
-          resolve(err); // Rejecting the promise on error
+          reject(err);
         } else {
           console.log(`Image conversion successful:`, stdout);
-          resolve(stdout);
+          try {
+            const files = fs
+              .readdirSync(outputDir)
+              .filter((file) => file.endsWith(".png"));
+            for (const file of files) {
+              const imageFrame = `${outputDir}${file}`;
+              const imageBuffer = fs.readFileSync(imageFrame);
+              const supabasePath = `${gameId}/${file}`;
+              try {
+                const { data, error } = await supabase.storage
+                  .from(supabaseBucket as string)
+                  .upload(supabasePath, imageBuffer, {
+                    contentType: "image/png",
+                  });
+
+                if (error) {
+                  console.error(`Error uploading to Supabase:`, error);
+                  continue; // or reject(error) based on your error handling policy
+                }
+                console.log(`Uploaded ${file} to Supabase:`, data);
+              } catch (error) {
+                console.error(`Error uploading to Supabase:`, error);
+                continue; // or reject(error) based on your error handling policy
+              }
+            }
+            resolve(stdout);
+          } catch (uploadErr) {
+            console.error(`Error in uploading process:`, uploadErr);
+            reject(uploadErr);
+          }
         }
       }
     );
@@ -195,7 +225,12 @@ export default async function handler(
 
       const write = await writeFile(filePath, gifBuffer);
       console.log("write", write);
-      const image = await convertImage(filePath);
+      // const image = await convertImage(filePath);
+      const image = await convertAndUploadImage(
+        filePath,
+        gameId as string,
+        turn
+      );
       console.log("image", image);
 
       const imageFrame = `${os.tmpdir()}/${turn ?? "0"}.png`;
