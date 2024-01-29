@@ -179,7 +179,7 @@ export default async function handler(
         .toBuffer();
       res.setHeader("Content-Type", "image/png");
       res.setHeader("Cache-Control", "max-age=10");
-      res.send(pngBuffer);
+      res.status(200).send(pngBuffer);
       return;
     }
     console.log("image not found");
@@ -215,7 +215,7 @@ export default async function handler(
       const imageBuffer = await readFileAsync(imageFrame);
 
       const { data, error } = await supabase.storage
-        .from(supabaseBucket)
+        .from(supabaseBucket as any)
         .upload(supabasePath, imageBuffer, {
           contentType: "image/png",
         });
@@ -270,7 +270,7 @@ export default async function handler(
         .toBuffer();
       res.setHeader("Content-Type", "image/png");
       res.setHeader("Cache-Control", "max-age=10");
-      res.send(pngBuffer);
+      res.status(200).send(pngBuffer);
       // const deleteFiles = await countAndDeleteGeneratedImages("tmp/");
       // console.log(`Deleted ${deleteFiles} files`);
 
@@ -284,40 +284,6 @@ export default async function handler(
       console.error(error);
       res.status(500).send("Error fetching or processing the GIF");
     }
-
-    // Process the GIF with ImageMagick or similar
-    // Example: exec(`convert -some-options ${gifBuffer} output.gif`, ...);
-
-    // After processing, you can send the GIF back or save it and send a URL
-
-    return res.status(200).send("GIF split into frames successfully");
-    const svg = await satori(
-      <div
-        style={{
-          justifyContent: "flex-start",
-          alignItems: "center",
-          display: "flex",
-          width: "100%",
-          height: "100%",
-          backgroundColor: "f4f4f4",
-          padding: 50,
-          lineHeight: 1.2,
-          fontSize: 24,
-        }}
-      ></div>,
-      {
-        width: 600,
-        height: 400,
-        fonts: [
-          {
-            data: fontData,
-            name: "Roboto",
-            style: "normal",
-            weight: 400,
-          },
-        ],
-      }
-    );
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating image");
