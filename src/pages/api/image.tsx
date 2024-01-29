@@ -79,7 +79,7 @@ function convertImage(filePath: any) {
   return new Promise((resolve, reject) => {
     im.convert(
       [filePath, "-coalesce", "+adjoin", `${os.tmpdir()}/%d.png`],
-      (err, stdout) => {
+      (err: any, stdout: any) => {
         if (err) {
           console.log(`Error converting image ${filePath}:`, err);
           resolve(err); // Rejecting the promise on error
