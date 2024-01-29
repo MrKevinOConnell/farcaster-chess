@@ -182,18 +182,18 @@ export default async function handler(
       if (!response.ok) {
         throw new Error(`Error fetching GIF: ${response.statusText}`);
       }
-      const directory = "tmp"; // Or the correct path to your directory
+      const directory = "/tmp"; // Or the correct path to your directory
       // await ensureDirectoryExists(directory);
       const writeFile = promisify(fs.writeFile);
       const readFileAsync = promisify(fs.readFile);
       const arrayBuffer = await response.arrayBuffer();
       const gifBuffer = Buffer.from(arrayBuffer);
-      const filePath = "tmp/image.gif";
+      const filePath = "/tmp/image.gif";
       const write = await writeFile(filePath, gifBuffer);
 
       const image = await convertImage(filePath);
 
-      const imageFrame = `tmp/${turn ?? "0"}.png`;
+      const imageFrame = `/tmp/${turn ?? "0"}.png`;
       // Check if the file exists before attempting to read
       if (!fs.existsSync(imageFrame)) {
         throw new Error(`File not found: ${imageFrame}`);
