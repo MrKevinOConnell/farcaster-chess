@@ -1,4 +1,7 @@
 module.exports = {
-  plugins: {},
-  tailwind: {},
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+  exclude: "node_modules",
 };
