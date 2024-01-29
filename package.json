@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next",
-    "build": "npm i; next build",
-    "start": "next start -H 0.0.0.0",
-    "start-localhost": "next start"
+    "dev": "next dev",
+    "build": "npm i && next build",
+    "start": "next start"
   },
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "^2.13.0",
