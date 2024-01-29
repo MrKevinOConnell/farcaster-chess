@@ -64,7 +64,8 @@
     "wagmi": "^0.10.1",
     "yarn": "^1.22.19",
     "zustand": "^4.3.2",
-    "zustand-persist": "^0.4.0"
+    "zustand-persist": "^0.4.0",
+    "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
     "@types/imagemagick": "^0.0.35",
@@ -73,6 +74,6 @@
     "encoding": "^0.1.13",
     "eslint-config-next": "^14.1.0",
     "postcss": "^8.4.33",
-    "tailwindcss": "^3.4.1"
+
   }
 }
