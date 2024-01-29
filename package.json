@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "npm i && prisma generate && next build",
+    "dev": "next",
+    "build": "next build",
     "start": "next start -H 0.0.0.0",
-    "lint": "next lint"
+    "start-localhost": "next start"
   },
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "^2.13.0",
