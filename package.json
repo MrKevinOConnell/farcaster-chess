@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm i && next build",
+    "build": "npm --production=false install && next build",
     "start": "next start"
   },
   "dependencies": {
