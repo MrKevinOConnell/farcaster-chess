@@ -11,6 +11,7 @@ import * as fs from "fs";
 import { Chessboard } from "react-chessboard";
 import prisma from "./../../../prisma/client";
 import im from "imagemagick";
+import * as gifFrames from "gif-frames";
 const unlinkAsync = promisify(fs.unlink);
 
 const mkdir = promisify(fs.mkdir);
@@ -82,18 +83,25 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 
 function convertImage(filePath: any) {
   return new Promise((resolve, reject) => {
-    im.convert(
-      [filePath, "-coalesce", "+adjoin", "/tmp/%d.png"],
-      (err, stdout) => {
-        if (err) {
-          console.log(`Error converting image ${filePath}:`, err);
-          resolve(err); // Rejecting the promise on error
-        } else {
-          console.log(`Image conversion successful:`, stdout);
-          resolve(stdout);
-        }
-      }
-    );
+    gifFrames({
+      url: filePath,
+      frames: "all",
+      outputType: "png",
+      cumulative: true,
+    })
+      .then(async function (frameData: any) {
+        await frameData.forEach(function (frame: any, index: any) {
+          console.log(`Converting frame ${index}`, frame);
+          frame.getImage().pipe(fs.createWriteStream(`/tmp/${index}.png`));
+        });
+
+        console.log(`Image conversion successful`);
+        resolve(`/tmp/${frameData.length - 1}.png`);
+      })
+      .catch(function (err: any) {
+        console.error(`Error converting image ${filePath}:`, err);
+        reject(err);
+      });
   });
 }
 
