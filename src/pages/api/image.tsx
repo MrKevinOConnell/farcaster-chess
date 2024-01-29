@@ -21,6 +21,8 @@ async function ensureDirectoryExists(directory: string) {
   }
 }
 
+const writeFile = promisify(fs.writeFile);
+
 async function countAndDeleteGeneratedImages(filePath: any) {
   const directory = filePath.substring(0, filePath.lastIndexOf("/")) || ".";
   let counter = 0;
@@ -78,17 +80,16 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
   }
 };
 
-function convertImage(filePath: string) {
+function convertImage(filePath: any) {
   return new Promise((resolve, reject) => {
     im.convert(
       [filePath, "-coalesce", "+adjoin", "/tmp/%d.png"],
-      function (err, stdout) {
+      (err, stdout) => {
         if (err) {
-          console.error("Error:", err);
-          resolve(err);
+          console.log(`Error converting image ${filePath}:`, err);
+          resolve(err); // Rejecting the promise on error
         } else {
-          console.log("stdout:", stdout);
-
+          console.log(`Image conversion successful:`, stdout);
           resolve(stdout);
         }
       }
@@ -175,6 +176,7 @@ export default async function handler(
       res.send(pngBuffer);
       return;
     }
+    console.log("image not found");
     const url = `https://lichess1.org/game/export/gif/white/${gameId}.gif?theme=brown&piece=cburnett`;
 
     try {
@@ -182,21 +184,24 @@ export default async function handler(
       if (!response.ok) {
         throw new Error(`Error fetching GIF: ${response.statusText}`);
       }
-      const directory = "/tmp"; // Or the correct path to your directory
+      const filePath = "/tmp/image.gif";
+      // Or the correct path to your directory
       // await ensureDirectoryExists(directory);
-      const writeFile = promisify(fs.writeFile);
+      console.log("reading file");
       const readFileAsync = promisify(fs.readFile);
       const arrayBuffer = await response.arrayBuffer();
       const gifBuffer = Buffer.from(arrayBuffer);
-      const filePath = "/tmp/image.gif";
-      const write = await writeFile(filePath, gifBuffer);
+      console.log("gifBuffer", gifBuffer);
 
+      const write = await writeFile(filePath, gifBuffer);
+      console.log("write", write);
       const image = await convertImage(filePath);
+      console.log("image", image);
 
       const imageFrame = `/tmp/${turn ?? "0"}.png`;
       // Check if the file exists before attempting to read
       if (!fs.existsSync(imageFrame)) {
-        throw new Error(`File not found: ${imageFrame}`);
+        console.log(`File not found: ${imageFrame}`);
       }
       const supabasePath = `${gameId}/${turn ?? "0"}.png`;
       const imageBuffer = await readFileAsync(imageFrame);
