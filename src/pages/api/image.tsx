@@ -8,10 +8,11 @@ import sharp from "sharp";
 import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
+import * as os from "os";
 import { Chessboard } from "react-chessboard";
 import prisma from "./../../../prisma/client";
 import im from "imagemagick";
-import * as gifFrames from "gif-frames";
+import * as gif from "gif-frames";
 const unlinkAsync = promisify(fs.unlink);
 
 const mkdir = promisify(fs.mkdir);
@@ -83,25 +84,18 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 
 function convertImage(filePath: any) {
   return new Promise((resolve, reject) => {
-    gifFrames({
-      url: filePath,
-      frames: "all",
-      outputType: "png",
-      cumulative: true,
-    })
-      .then(async function (frameData: any) {
-        await frameData.forEach(function (frame: any, index: any) {
-          console.log(`Converting frame ${index}`, frame);
-          frame.getImage().pipe(fs.createWriteStream(`/tmp/${index}.png`));
-        });
-
-        console.log(`Image conversion successful`);
-        resolve(`/tmp/${frameData.length - 1}.png`);
-      })
-      .catch(function (err: any) {
-        console.error(`Error converting image ${filePath}:`, err);
-        reject(err);
-      });
+    im.convert(
+      [filePath, "-coalesce", "+adjoin", "/tmp/%d.png"],
+      (err, stdout) => {
+        if (err) {
+          console.log(`Error converting image ${filePath}:`, err);
+          resolve(err); // Rejecting the promise on error
+        } else {
+          console.log(`Image conversion successful:`, stdout);
+          resolve(stdout);
+        }
+      }
+    );
   });
 }
 
@@ -192,7 +186,9 @@ export default async function handler(
       if (!response.ok) {
         throw new Error(`Error fetching GIF: ${response.statusText}`);
       }
-      const filePath = "/tmp/image.gif";
+      const filePath = `${os.tmpdir()}/image.gif`;
+      console.log("filePath", filePath);
+
       // Or the correct path to your directory
       // await ensureDirectoryExists(directory);
       console.log("reading file");
