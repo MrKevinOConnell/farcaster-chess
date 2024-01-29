@@ -16,14 +16,6 @@ import * as gif from "gif-frames";
 const unlinkAsync = promisify(fs.unlink);
 const supabaseBucket = process.env.NEXT_PUBLIC_BUCKET_NAME;
 
-const mkdir = promisify(fs.mkdir);
-
-async function ensureDirectoryExists(directory: string) {
-  if (!fs.existsSync(directory)) {
-    await mkdir(directory, { recursive: true });
-  }
-}
-
 const writeFile = promisify(fs.writeFile);
 
 async function countAndDeleteGeneratedImages(filePath: any) {
