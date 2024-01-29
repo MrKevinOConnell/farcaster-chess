@@ -93,7 +93,8 @@ function convertAndUploadImage(filePath: string, gameId: string, turn: any) {
             for (const file of files) {
               const imageFrame = `${outputDir}${file}`;
               const imageBuffer = fs.readFileSync(imageFrame);
-              const supabasePath = `${gameId}/${file}`;
+              const supabasePath = `${gameId}/${file}.png`;
+
               try {
                 const { data, error } = await supabase.storage
                   .from(supabaseBucket as string)
@@ -238,14 +239,8 @@ export default async function handler(
       if (!fs.existsSync(imageFrame)) {
         console.log(`File not found: ${imageFrame}`);
       }
-      const supabasePath = `${gameId}/${turn ?? "0"}.png`;
-      const imageBuffer = await readFileAsync(imageFrame);
 
-      const { data, error } = await supabase.storage
-        .from(supabaseBucket as any)
-        .upload(supabasePath, imageBuffer, {
-          contentType: "image/png",
-        });
+      const imageBuffer = await readFileAsync(imageFrame);
 
       const base64Image = Buffer.from(imageBuffer).toString("base64");
       const dataUrl = `data:image/png;base64,${base64Image}`; // Adjust the MIME type if necessary
