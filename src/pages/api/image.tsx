@@ -85,7 +85,7 @@ const checkFileExistsAndGetUrl = async (bucket: any, path: string) => {
 function convertImage(filePath: any) {
   return new Promise((resolve, reject) => {
     im.convert(
-      [filePath, "-coalesce", "+adjoin", "/tmp/%d.png"],
+      [filePath, "-coalesce", "+adjoin", `${os.tmpdir()}/%d.png`],
       (err, stdout) => {
         if (err) {
           console.log(`Error converting image ${filePath}:`, err);
@@ -202,7 +202,7 @@ export default async function handler(
       const image = await convertImage(filePath);
       console.log("image", image);
 
-      const imageFrame = `/tmp/${turn ?? "0"}.png`;
+      const imageFrame = `${os.tmpdir()}/${turn ?? "0"}.png`;
       // Check if the file exists before attempting to read
       if (!fs.existsSync(imageFrame)) {
         console.log(`File not found: ${imageFrame}`);
