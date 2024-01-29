@@ -453,7 +453,6 @@ export default function Home() {
         ))}
         <Chessboard
           position={currentGame.fen()}
-          customBoardStyle={{ width: "100%", height: "100%" }}
           boardOrientation={boardOrientation}
           onPieceDrop={(source, target, piece) =>
             handleMove(source, target, piece) as any
