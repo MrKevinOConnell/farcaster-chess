@@ -11,7 +11,7 @@
     "@bity/oauth2-auth-code-pkce": "^2.13.0",
     "@chrisoakman/chessboardjs": "^1.0.0",
     "@emotion/react": "^11.10.5",
-    "@farcaster/auth-kit": "^0.0.39",
+    "@farcaster/auth-kit": "0.0.39",
     "@imagemagick/magick-wasm": "^0.0.28",
     "@mantine/core": "^5.10.1",
     "@mantine/hooks": "^5.10.1",
@@ -64,7 +64,8 @@
     "wagmi": "^0.10.1",
     "yarn": "^1.22.19",
     "zustand": "^4.3.2",
-    "zustand-persist": "^0.4.0"
+    "zustand-persist": "^0.4.0",
+    "tailwindcss": "3.4.1"
   },
   "devDependencies": {
     "@types/imagemagick": "^0.0.35",
@@ -73,6 +74,6 @@
     "encoding": "^0.1.13",
     "eslint-config-next": "^14.1.0",
     "postcss": "^8.4.33",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "3.4.1"
   }
 }
