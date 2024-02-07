@@ -182,6 +182,7 @@ export default function Home() {
           ) {
             setGameStatus("active");
           }
+          console.log("Game full", obj);
           setupGame(obj.state.moves);
           setWhiteTime(obj.state.wtime); // Convert milliseconds to seconds
           setBlackTime(obj.state.btime); // Convert milliseconds to seconds
@@ -218,14 +219,20 @@ export default function Home() {
 
       const onMessage = (obj: any) => {
         if (obj.type === "gameStart") {
+          console.log("Game started", obj);
+          setCurrentGameId(obj.game.gameId);
+          setBoardOrientation(obj.game.color);
+          setWhiteTime(obj.game.secondsLeft * 1000);
+          setBlackTime(obj.game.secondsLeft * 1000);
+
+          updateStoreModal && updateStoreModal(false);
+          updateLichessModal(false);
+
           setChallenges((prev: any) => {
             return prev.filter((challenge: any) => {
               return challenge.gameId !== obj.game.id;
             });
           });
-          setCurrentGameId(obj.gameId);
-          updateStoreModal && updateStoreModal(false);
-          updateLichessModal(false);
         } else if (obj.status === "gameFinish") {
           setGameStatus("ended");
           //check if user won
@@ -428,66 +435,88 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full md:flex-row md:justify-around">
-      <select
-        onChange={(e) => setCurrentGameId(e.target.value)}
-        className="mb-4 md:mb-0"
-      >
-        {games.map((game: any) => (
-          <option key={game.currentGameId} value={game.currentGameId}>
-            {game.username}
-          </option>
-        ))}
-      </select>
-
-      <div className="w-11/12 max-w-lg mb-4 md:mb-0 md:max-w-xl">
-        {challenges.map((challenge: any) => (
-          <div key={challenge.gameId}>
-            <p>Challenge {challenge.challenger}</p>
-            <button
-              onClick={async () => await acceptChallenge(challenge.gameId)}
-            >
-              Accept
-            </button>
-          </div>
-        ))}
-        <Chessboard
-          position={currentGame.fen()}
-          boardOrientation={boardOrientation}
-          onPieceDrop={(source, target, piece) =>
-            handleMove(source, target, piece) as any
-          }
-        />
-        <div className="flex justify-around items-center my-4">
-          <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
-            <p className="text-lg font-semibold">White</p>
-            <p className="text-2xl font-mono">{formatTime(whiteTime as any)}</p>
-          </div>
-
-          <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
-            <p className="text-lg font-semibold">Black</p>
-            <p className="text-2xl font-mono">{formatTime(blackTime as any)}</p>
-          </div>
-          {currentGameData && (
-            <button
-              className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-red-700"
-              onClick={handleResign}
-            >
-              Resign
-            </button>
+    <div className="w-full flex flex-col items-center justify-center px-10">
+      <div className="my-4">
+        <select
+          onChange={(e) => setCurrentGameId(e.target.value)}
+          className="mb-4"
+        >
+          {games.length > 0 ? (
+            games.map((game: any) => (
+              <option key={game.currentGameId} value={game.currentGameId}>
+                {game.username}
+              </option>
+            ))
+          ) : (
+            <option className="text-slate-100">No active games</option>
           )}
-
-          <button
-            className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-red-700"
-            onClick={async () => await updateStoreModal(true)}
-          >
-            Challenge
-          </button>
-        </div>
+        </select>
       </div>
 
-      <div className="w-11/12 max-w-sm">
-        <ChatRoom gameId={currentGameId} turnNumber={currentTurnNumber} />
+      <div className="flex flex-col md:flex-row items-center justify-between w-full">
+        <div className="w-full md:w-1/2 lg:w-1/3 mb-4">
+          {challenges.length > 0 ? (
+            challenges.map((challenge: any) => (
+              <div key={challenge.gameId} className="mb-2">
+                <p>Challenge {challenge.challenger}</p>
+                <button
+                  onClick={async () => await acceptChallenge(challenge.gameId)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Accept
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-slate-100">No challenges at the moment</p>
+          )}
+        </div>
+
+        {
+          <div className="w-full md:w-1/2 lg:w-1/3">
+            <Chessboard
+              position={currentGame.fen()}
+              boardOrientation={boardOrientation}
+              onPieceDrop={(source, target, piece) =>
+                handleMove(source, target, piece) as any
+              }
+            />
+            <div className="flex justify-around items-center my-4">
+              <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
+                <p className="text-lg font-semibold">White</p>
+                <p className="text-2xl font-mono">
+                  {formatTime(whiteTime as any)}
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center bg-gray-800 text-white p-4 rounded-lg shadow">
+                <p className="text-lg font-semibold">Black</p>
+                <p className="text-2xl font-mono">
+                  {formatTime(blackTime as any)}
+                </p>
+              </div>
+              {currentGameData && (
+                <button
+                  className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-red-700"
+                  onClick={handleResign}
+                >
+                  Resign
+                </button>
+              )}
+
+              <button
+                className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-2 hover:bg-red-700"
+                onClick={async () => await updateStoreModal(true)}
+              >
+                Challenge
+              </button>
+            </div>
+          </div>
+        }
+
+        <div className="w-full md:w-1/2 lg:w-1/3 mt-4 md:mt-0">
+          <ChatRoom gameId={currentGameId} turnNumber={currentTurnNumber} />
+        </div>
       </div>
     </div>
   );

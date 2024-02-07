@@ -61,11 +61,6 @@ export default async function handler(
         buttonIndex === 2 && newTurn !== 0
       }">
             </head>
-            <body>
-                <h1>Chess Game</h1>
-              <img src="${
-                process.env.NEXT_PUBLIC_URL
-              }/api/image?gameId=${gameId}&turn=${turn}" />
             </html>
           `);
     } catch (e: unknown) {

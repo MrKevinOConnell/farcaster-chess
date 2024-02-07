@@ -140,7 +140,7 @@ const LichessModal = () => {
     <>
       <Modal
         opened={openModal}
-        size="80%" // Set the size of the modal
+        className="absolute top-1/3"
         onClose={async () => await updateStoreModal(false)}
       >
         {invitee && invitee.lichess_info && user && user.accessToken ? (

@@ -7,6 +7,8 @@ import { SignInButton } from "@farcaster/auth-kit";
 import { Profile } from "@/components/Profile";
 import ChallengeModal from "@/components/ChallengeModal";
 import LichessModal from "@/components/LichessModal";
+import { useStore } from "@/store";
+import SignerModal from "@/components/SignerModal";
 
 const config = {
   rpcUrl: process.env.NEXT_PUBLIC_OPTIMISM_RPC as string,
@@ -15,6 +17,9 @@ const config = {
 };
 
 export default function App({ Component, pageProps }: AppProps) {
+  const qrCode = useStore((state: any) => state.qrCode);
+  const setQrCode = useStore((state: any) => state.setQrCode);
+
   return (
     <AuthKitProvider config={config}>
       <div
@@ -29,6 +34,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <div className="flex justify-end p-2 m-4">
         <Profile />
       </div>
+
+      <SignerModal />
       <ChallengeModal />
       <LichessModal />
 

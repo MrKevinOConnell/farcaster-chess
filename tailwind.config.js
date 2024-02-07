@@ -7,7 +7,14 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        purpleCustom: "#A020F0",
+        coral: "#FF7F50",
+        // Add a darker shade of Coral if you need it for hover states or contrast
+        "coral-dark": "#E57370",
+      },
+    },
   },
   plugins: [],
 };

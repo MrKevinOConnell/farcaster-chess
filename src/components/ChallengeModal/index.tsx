@@ -21,7 +21,7 @@ const ChallengeModal = () => {
   const challengeUser = async (username: string) => {
     try {
       const body = {
-        rated: true,
+        rated: false,
         "clock.limit": 600,
         "clock.increment": 0,
         color: "white",
@@ -100,6 +100,7 @@ const ChallengeModal = () => {
     <>
       <Modal
         opened={openModal}
+        className="absolute top-1/3"
         onClose={async () => await updateStoreModal(false)}
         title="Challenge"
       >
@@ -110,17 +111,20 @@ const ChallengeModal = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <ul>
+          <div className="space-y-2 space-x-2">
             {users.map((user: any) => (
               <button
                 key={user.fid}
                 onClick={async () => await sendChallenge(user)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded mt-2"
               >
-                {user.username} - {user.display_name}
+                <div className="flex space-x-2 items-center">
+                  <img className="rounded-full w-10 h-10" src={user.pfp_url} />
+                  <p>{user.username}</p>
+                </div>
               </button>
             ))}
-          </ul>
+          </div>
         </div>
       </Modal>
     </>

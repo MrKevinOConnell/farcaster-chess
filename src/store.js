@@ -6,7 +6,11 @@ export const useStore = create(
     (set) => ({
       user: null,
       invitedUser: null,
-
+      qrCode: null,
+      openSignerModal: false,
+      setOpenSignerModal: (openSignerModal) =>
+        set((state) => ({ ...state, openSignerModal })),
+      setQrCode: (qrCode) => set((state) => ({ ...state, qrCode })),
       setInvitedUser: (invitedUser) =>
         set((state) => ({ ...state, invitedUser })),
       setUser: (user) => set((state) => ({ ...state, user })),

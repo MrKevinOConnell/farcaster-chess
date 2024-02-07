@@ -35,6 +35,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
   const [newMessage, setNewMessage] = useState("");
   const [parentURL, setParentURL] = useState(chessChannel);
   const user = useStore((state: any) => state.user);
+  const qrCode = useStore((state: any) => state.qrCode);
+  const setOpenSignerModal = useStore((state) => state.setOpenSignerModal);
+  const setQrCode = useStore((state: any) => state.setQrCode);
 
   async function getFarcasterThreadHash(gameId: string | null) {
     if (!gameId) {
@@ -153,6 +156,17 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
     }
   );
 
+  useEffect(() => {
+    if (
+      signerData &&
+      signerData.signer_approval_url &&
+      signerData.status !== "approved"
+    ) {
+      setQrCode(signerData.signer_approval_url);
+      setOpenSignerModal(true);
+    }
+  }, [signerData]);
+
   async function fetchSigner(): Promise<any | null> {
     try {
       if (!user || !user.fid) return null;
@@ -175,6 +189,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
     if (!user.fid) return;
     // save the FID to SecureStore
     try {
+      setQrCode(null);
+      setOpenSignerModal(false);
       // send fid and status to database
       const endpoint = `/api/signer?user_id=${user.fid}`;
       const options = {
@@ -186,7 +202,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
       };
 
       const fetch = await fetcher(endpoint, options);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {
@@ -224,19 +242,10 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      {signerData &&
-      signerData.signer_approval_url &&
-      signerData.status !== "approved" ? (
-        <div className="  p-2 items-center justify-center w-full ">
-          {" "}
-          {/* Center the QR Code */}
-          <QRCode size={256} value={signerData.signer_approval_url} />
-        </div>
-      ) : null}
+    <div className="flex flex-col w-full px-10">
       <div
         ref={chatContainerRef}
-        className="flex-grow overflow-y-auto p-4 border-b border-gray-300 h-64 flex flex-col-reverse"
+        className="flex-grow overflow-y-auto p-4 border-b border-purpleCustom h-64 flex flex-col-reverse"
       >
         {messages.map((message: any, index: number) => (
           <div key={index} className="mb-4 break-words">
@@ -245,14 +254,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
                 className="w-8 h-8 rounded-full"
                 src={message.author.pfp_url ?? message.author.pfp.url ?? ""}
               />
-              <strong className="font-semibold">
+              <strong className="font-semibold text-slate-100">
                 <span className="font-medium opacity-50">
                   @{message.author.username} • 
                   {getRelativeTime(message.timestamp ?? 0)}
                 </span>
               </strong>
             </div>
-            <span>{message.text}</span>
+            <span className="text-slate-100">{message.text}</span>
           </div>
         ))}
       </div>
@@ -264,7 +273,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ gameId, turnNumber }) => {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           className="border border-gray-300 p-2 w-full"
-          placeholder="Type a message..."
+          placeholder={
+            signerData &&
+            signerData.signer_approval_url &&
+            signerData.status === "approved"
+              ? "Send a message"
+              : "Sign in to chat"
+          }
         />
         <button
           onClick={sendMessage}
